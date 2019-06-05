@@ -60,6 +60,37 @@ app.post('/users', (req, res) => {
     })
 });
 
+// Fetch one single user
+app.get('/user/:id', (req, res) =>{
+    var db = req.db;
+    User.findById(req.params.id, function (error, user) {
+        if (error) {
+            console.error(error);
+        }
+        res.send(user);
+    })
+});
+
+// Update one  single user
+app.put('/users/:id', (req, res) => {
+    var db = req.db;
+    User.findById(req.params.id, function (error, user) {
+        if (error) {
+            console.error(error);
+        }
+        user.FL = req.body.FL;
+        user.description = req.body.description;
+        user.save(function (error) {
+            if (error) {
+                console.error(error);
+            }
+            res.send({
+                success: true
+            })
+        })
+    })
+});
+
 
 
 app.listen(process.env.PORT || 8081);
