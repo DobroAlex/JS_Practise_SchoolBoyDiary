@@ -1,17 +1,26 @@
 const express = require('express');
+
+/* Those are added to fix  "undefined  method or function
+for app.get() app.post() and seems to work fine
+https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000006064-unresolved-function-or-method
+5 May 19
+*/
+const serve_static = require('serve-static');
+const express_server_static_core = require('express-serve-static-core');
+
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
-var mongoose= require('mongoose');
+const  mongoose= require('mongoose');
 var User = require("../models/user.js");
-const app = express()
-app.use(morgan('combined'))
-app.use(bodyParser.json())
-app.use(cors())
+const app = express();
+app.use(morgan('combined'));
+app.use(bodyParser.json());
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/users');
 var db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error"))
+db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function (callback) {
     console.log("Successfully connected to db");
 
@@ -38,11 +47,11 @@ app.post('/users', (req, res) => {
     var new_user = new User({
         FL: FL,
         description: description
-    })
+    });
 
     new_user.save(function (error) {
         if(error){
-            console.log(error)
+            console.log(error);
         }
         res.send({
             success: true,
