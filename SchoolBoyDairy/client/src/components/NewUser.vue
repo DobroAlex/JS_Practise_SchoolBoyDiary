@@ -18,7 +18,7 @@
 <script>
     import UsersService from '@/services/UsersService'
     export default {
-        name: "NewUser",
+        name: 'NewUser',
         data() {
           return {
             FL: '',
@@ -30,14 +30,14 @@
               await  UsersService.addUser({
                   FL: this.FL,
                   description: this.description
-              })
+              });
               this.$router.push({name: 'Users'})
             }
         }
     }
 </script>
 
-<style scoped>
+<style type="text/css">
   .form input, .form textarea {
     width: 500px;
     padding: 10px;
