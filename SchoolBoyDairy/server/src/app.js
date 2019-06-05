@@ -91,6 +91,23 @@ app.put('/users/:id', (req, res) => {
     })
 });
 
+//Delete one user
+app.delete('/user/:id', (req, res) => {
+    var db = req.db;
+    User.remove({
+        _id: req.params.id,
+    },
+        function (error, user) {
+            if (error){
+                res.send(error);
+                console.error(error);
+        }
+            res.send({
+                success: true
+            })
+    })
+});
+
 
 
 app.listen(process.env.PORT || 8081);
