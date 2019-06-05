@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import  HelloWorld from '@/components/HelloWorld'
 import Users from '@/components/Users' // this should work. If not, look at replacing / with \\
 import NewUser from '@/components/NewUser'
+import EditUser from "../components/EditUser";
 
 Vue.use(Router);
 
