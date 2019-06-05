@@ -23,6 +23,11 @@ export default new Router({ //!!!!!https://stackoverflow.com/questions/45992932/
       path: '/users/new',
       name: 'NewUser',
       component: NewUser
+    },
+    {
+      path: '/users/:id',
+      name: 'EditUser',
+      component: EditUser
     }
 
   ]
