@@ -62,7 +62,7 @@
     margin: 20px;
   }
   .app_user_edit_btn {
-    background: #4d7ef7;
+    background: #282cf7;
     color: #fff;
     padding: 10px 80px;
     text-transform: uppercase;
