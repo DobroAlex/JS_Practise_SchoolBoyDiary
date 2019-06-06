@@ -1,7 +1,7 @@
 import Api from '@/services/Api'
 
 export default {
-  fetchUsers(){
+  fetchUsers() {
     return Api().get('users')
   },
   addUser(params) {
@@ -14,7 +14,6 @@ export default {
     return Api().get('user/' + params.id);
   },
   deleteUser(id) {
-    return Api().delete('users/' + id)
+    return Api().delete('users/' + id);
   }
-
 }

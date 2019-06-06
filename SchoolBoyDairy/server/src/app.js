@@ -99,12 +99,14 @@ app.delete('/user/:id', (req, res) => {
     },
         function (error, user) {
             if (error){
-                res.send(error);
                 console.error(error);
+                return res.send(error);
+
         }
             res.send({
                 success: true
-            })
+            });
+            console.log(`Deleted ${req.params.id}`)
     })
 });
 
