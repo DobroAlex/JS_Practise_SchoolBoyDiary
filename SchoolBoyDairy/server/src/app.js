@@ -8,14 +8,19 @@ const app = express();
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(cors());
-
-mongoose.connect('mongodb://localhost:27017/users');
-let db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error"));
-db.once("open", function () {
-    console.log("Successfully connected to db");
+let db;
+mongoose.connect('mongodb://localhost:27017/users').then(
+    () => {db = mongoose.connection; console.log("Successfully connected to db")},
+    err => {console.log(err)}
+);
+//let db = mongoose.connection;
+/*db.on("error", function (err) {
+    console.log(err);
+});*/
+/*db.once("open", function () {
+    console.log("Successfully connected to db" );
 });
-
+*/
 app.get('/users', (req,res) => {
     User.find({}, "FL description",  function (error, users) {      // now returns only specific fileds:
                                                                     // FL and description
