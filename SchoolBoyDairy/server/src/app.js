@@ -60,21 +60,10 @@ app.post('/users', (req, res) => {
     })
 });
 
-// Fetch one single user
-app.get('/user/:id', (req, res) =>{
-    var db = req.db;
-    User.findById(req.params.id, function (error, user) {
-        if (error) {
-            console.error(error);
-        }
-        res.send(user);
-    })
-});
-
 // Update one  single user
 app.put('/users/:id', (req, res) => {
     var db = req.db;
-    User.findById(req.params.id, function (error, user) {
+    User.findById(req.params.id, 'FL description' ,function (error, user) {
         if (error) {
             console.error(error);
         }
@@ -101,7 +90,6 @@ app.delete('/user/:id', (req, res) => {
             if (error){
                 console.error(error);
                 return res.send(error);
-
         }
             res.send({
                 success: true
@@ -110,6 +98,16 @@ app.delete('/user/:id', (req, res) => {
     })
 });
 
+// Fetch one single user
+app.get('/user/:id', (req, res) =>{
+    var db = req.db;
+    User.findById(req.params.id, 'FL description', function (error, user) {
+        if (error) {
+            console.error(error);
+        }
+        res.send(user);
+    })
+});
 
 
 app.listen(process.env.PORT || 8081);
