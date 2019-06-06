@@ -15,8 +15,8 @@
           <td>{{ user.FL }}</td>
           <td>{{ user.description }}</td>
           <td align="center">
-            <router-link v-bind:to="{ name: 'EditUser', params: { id:user._id } }"> Edit User </router-link> |  <!-- Why is this vertical sign here? -->
-            <a href="#"> Delete </a>
+            <router-link v-bind:to="{ name: 'EditUser', params: { id:user._id } }"> Edit User </router-link> |  <!-- Visual Separation symbol -->
+            <a href="#" @click="deleteUser(user._id)">Delete User</a>
           </td>
         </tr>
       </table>
@@ -42,8 +42,12 @@
     },
     methods: {
       async getUsers() {
-        const response = await UserService.fetchUsers()
+        const response = await UserService.fetchUsers();
         this.users = response.data.users
+      },
+      async deleteUser(id) {
+        await UserService.deleteUser(id);
+        this.$router.push({ name:'Users' })
       }
     }
   }
