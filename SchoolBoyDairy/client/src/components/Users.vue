@@ -28,6 +28,7 @@
   </div>
 </template>
 
+
 <script>
   import UserService from '@/services/UsersService'
   export default {
@@ -46,8 +47,23 @@
         this.users = response.data.users
       },
       async deleteUser(id) {
-        await UserService.deleteUser(id);
-        this.$router.push({ name:'Users' })
+        const $this = this;
+        $this.$swal({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#282cf7',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete him!'
+        }).then(function (res) {
+          if (res.value) {
+            UserService.deleteUser(id);
+            $this.$router.go({
+              path: '/'
+            })
+          }
+        })
       }
     }
   }
