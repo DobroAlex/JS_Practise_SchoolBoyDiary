@@ -22,7 +22,7 @@ mongoose.connect('mongodb://localhost:27017/users').then(
 });
 */
 app.get('/users', (req,res) => {
-    User.find({}, "FL description",  function (error, users) {      // now returns only specific fileds:
+    User.find({}, "FL description",  function (error, users) {      // now returns only specific fields:
                                                                     // FL and description
         if (error){
             console.error(error);
