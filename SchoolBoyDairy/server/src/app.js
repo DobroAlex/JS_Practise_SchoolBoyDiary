@@ -36,7 +36,7 @@ mongoose.connect('mongodb://localhost:27017/users').then(
 });*/
 app.get("/users", async (req, res) => {
     try {
-        let searchResults = await User.find({}, "FL description")
+        await User.find({}, "FL description")
             .then((users) => res.send({
                     users: users
                 }),
