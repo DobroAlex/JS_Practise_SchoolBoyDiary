@@ -40,10 +40,9 @@ app.get("/users", async (req, res) => {
             .then((users) => res.send({
                     users: users
                 }),
-                () => {}
             )
             .catch((error) => {
-                console.error(`Error in GET(/users)! ${error}`)
+                console.error(`Error in GET(/users) in User.find()! ${error}`)
             })
     }
     catch (e) {
