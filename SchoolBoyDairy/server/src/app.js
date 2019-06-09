@@ -35,14 +35,20 @@ mongoose.connect('mongodb://localhost:27017/users').then(
     }).sort({_id:-1})
 });*/
 app.get("/users", async (req, res) => {
-    await User.find({}, "FL description", async function (error, users) {
-        if(error) {
-            console.error(error)
-        }
-        await res.send({
-            users: users
-        })
-    }).sort({_id:-1})
+    try {
+        let searchResults = await User.find({}, "FL description")
+            .then((users) => res.send({
+                    users: users
+                }),
+                () => {}
+            )
+            .catch((error) => {
+                console.error(`Error in GET(/users)! ${error}`)
+            })
+    }
+    catch (e) {
+        console.error(`Error in GET(/users)! ${error}`)
+    }
 });
 app.post('/users', (req, res) => {
     let FL = req.body.FL;
