@@ -8,10 +8,11 @@ const app = express();
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(cors());
+const server =  app.listen(process.env.PORT || 8081);
 let db;
 mongoose.connect('mongodb://localhost:27017/users').then(
     () => {db = mongoose.connection; console.log("Successfully connected to db")},
-    err => {console.log(err)}
+    err => {console.log(err); console.error("Unable to connect to db, shutting down the server"); server.close()}
 );
 //let db = mongoose.connection;
 /*db.on("error", function (err) {
@@ -99,4 +100,4 @@ app.get('/user/:id', (req, res) =>{
 });
 
 
-app.listen(process.env.PORT || 8081);
+
