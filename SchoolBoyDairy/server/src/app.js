@@ -9,6 +9,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(cors());
 const server =  app.listen(process.env.PORT || 8081);
+console.log(`Server is listening to ${server.address().port}`);
 let db;
 mongoose.connect('mongodb://localhost:27017/users').then(
     () => {db = mongoose.connection; console.log("Successfully connected to db")},
@@ -22,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/users').then(
     console.log("Successfully connected to db" );
 });
 */
-app.get('/users', (req,res) => {
+/*app.get('/users', (req,res) => {
     User.find({}, "FL description",  function (error, users) {      // now returns only specific fields:
                                                                     // FL and description
         if (error){
@@ -32,8 +33,17 @@ app.get('/users', (req,res) => {
             users: users
         })
     }).sort({_id:-1})
+});*/
+app.get("/users", async (req, res) => {
+    await User.find({}, "FL description", async function (error, users) {
+        if(error) {
+            console.error(error)
+        }
+        await res.send({
+            users: users
+        })
+    }).sort({_id:-1})
 });
-
 app.post('/users', (req, res) => {
     let FL = req.body.FL;
     let description = req.body.description;
@@ -41,7 +51,6 @@ app.post('/users', (req, res) => {
         FL: FL,
         description: description
     });
-
     new_user.save(function (error) {
         if(error){
             console.log(error);
