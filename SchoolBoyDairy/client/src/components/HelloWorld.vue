@@ -86,6 +86,9 @@
 <script>
 export default {
   name: 'HelloWorld',
+  mounted() {
+    this.$router.push("/users")   //this will be replaced with push to /login then proper page will be created
+  },
   data () {
     return {
       msg: 'Welcome to Your Vue.js App, this is changed helloworld component'
@@ -93,7 +96,6 @@ export default {
   }
 }
 </script>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
