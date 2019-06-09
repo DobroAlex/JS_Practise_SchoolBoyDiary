@@ -34,7 +34,7 @@
           async getUser() {
             const response = await UsersService.getUser({
               id: this.$route.params.id
-            })
+            });
             this.FL = response.data.title;
             this.description = response.data.description;
           },
@@ -43,7 +43,7 @@
               id: this.$route.params.id,
               FL: this.FL,
               description: this.description
-            })
+            });
             this.$router.push({name: 'Users'})
           }
         }
