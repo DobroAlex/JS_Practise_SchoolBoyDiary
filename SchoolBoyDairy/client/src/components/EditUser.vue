@@ -35,7 +35,7 @@
             const response = await UsersService.getUser({
               id: this.$route.params.id
             });
-            this.FL = response.data.title;
+            this.FL = response.data.FL;
             this.description = response.data.description;
           },
           async updateUser() {
