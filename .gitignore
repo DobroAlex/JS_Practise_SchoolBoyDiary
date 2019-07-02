@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+SchoolBoyDairy/server_koa/\.vscode/launch\.json
+
+SchoolBoyDairy/server_koa/\.vscode/settings\.json
+
+SchoolBoyDairy/server_koa/mongo_logs/
