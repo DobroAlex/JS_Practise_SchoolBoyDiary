@@ -28,17 +28,22 @@ app.use(async function handleError (context, next) {
     // TODO: rework to handle different situations and notify user accordingly
     console.error(`Error occured: \n ${error}`)
     context.status = 500
-    context.body = error
+    context.body = error.message
   }
 })
 
 router.get('/users', async (context, next) => {
   const foundUsers = await User.find({}, 'fullName description').sort({ _id: -1 })
   context.ok({ users: foundUsers })
-  return next()
 })
 
 router.post('/users', async (context, next) => {
+  // TODO: add check for bad request (no fullName & description).If occured, throw exception
+
+  if (context.request.body.fullName == null || context.request.body.fullName == '' || context.request.body.description == null || context.request.body.description == '') {
+    throw new Error('No name OR description provided')
+  }
+
   let fullName = context.request.body.fullName
   let description = context.request.body.description
   let newUser = new User({
@@ -50,7 +55,6 @@ router.post('/users', async (context, next) => {
     success: true,
     message: `User ${fullName} saved successfuly`
   })
-  return next()
 })
 
 router.put('/users/:id', async (context, next) => {
