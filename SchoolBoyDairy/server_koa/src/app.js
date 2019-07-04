@@ -41,7 +41,7 @@ router.get('/users', async (context, next) => {
 router.post('/users', async (context, next) => {
   // TODO: add check for bad request (no fullName & description).If occured, throw exception
   if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
-    throw new Error('No name OR description provided')
+    // throw new Error('No name OR description provided')
   }
 
   let fullName = context.request.body.fullName
@@ -52,38 +52,45 @@ router.post('/users', async (context, next) => {
   })
   await newUser.save()
   context.send(201, {
-    success: true,
     message: `User ${fullName} saved successfuly`
   })
 })
 
 router.get('/users/:id', async (context, next) => {
   const foundUser = await User.findById(context.params.id, 'fullName description')
-  context.ok(foundUser)
+  if (!foundUser) {
+    context.notFound()
+  } else {
+    context.ok(foundUser)
+  }
 })
 
 router.put('/users/:id', async (context, next) => {
   if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
-    throw new Error('No name OR description provided')
+    // throw new Error('No name OR description provided')
   }
   const foundUser = await User.findById(context.params.id, 'fullName description')
+  if (!foundUser) {
+    context.notFound()
+  }
   foundUser.fullName = context.request.body.fullName
   foundUser.description = context.request.body.description
   foundUser.save()
   context.ok({
-    success: true,
     message: `User ${foundUser.fullName} updated`
   })
 })
 
 router.delete('/users/:id', async (context, next) => {
-  let userName
-  let foundUserCount = await User.count({ _id: context.params.id })
-  if (foundUserCount > 0) {
-    userName = await User.findById(context.params.id, 'fullName')
-    await User.findByIdAndDelete(context.params.id)
+  let foundUser = await User.findById(context.params.id, 'fullName')
+  if (!foundUser) {
+    context.notFound()
   }
-  context.ok(`User ${userName} deleted`)
+  let userName = foundUser.fullName
+  await User.findByIdAndDelete(context.params.id)
+  context.send(201, {
+    message: `User ${userName} deleted`
+  })
 })
 
 app.use(router.routes())
