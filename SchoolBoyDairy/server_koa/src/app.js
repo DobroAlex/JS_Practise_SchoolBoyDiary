@@ -82,10 +82,11 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.delete('/users/:id', async (context, next) => {
-  let foundUser = await User.findById(context.params.id, 'fullName')
-  if (!foundUser) {
+  if (await User.count({ _id: context.params.id }) === 0) {
     context.notFound()
+    return
   }
+  let foundUser = await User.findById(context.params.id)
   let userName = foundUser.fullName
   await User.findByIdAndDelete(context.params.id)
   context.send(201, {
