@@ -34,7 +34,7 @@ app.use(async function handleError (context, next) {
 
 router.get('/users', async (context, next) => {
   const foundUsers = await User.find({}, 'fullName description').sort({ _id: -1 })
-  context.response.body = ({ users: foundUsers })
+  context.ok({ users: foundUsers })
   return next()
 })
 
