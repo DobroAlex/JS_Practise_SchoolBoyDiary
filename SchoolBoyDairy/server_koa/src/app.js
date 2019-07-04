@@ -38,4 +38,28 @@ router.get('/users', async (context, next) => {
   return next()
 })
 
+router.post('/users', async (context, next) => {
+  let fullName = context.request.body.fullName
+  let description = context.request.body.description
+  let newUser = new User({
+    fullName: fullName,
+    description: description
+  })
+  await newUser.save()
+  context.send(201, {
+    success: true,
+    message: `User ${fullName} saved successfuly`
+  })
+  return next()
+})
+
+router.put('/users/:id', async (context, next) => {
+  const foundUser = await User.findById(context.request._id, 'fullName description')
+  foundUser.fullName = context.request.body.fullName
+  foundUser.description = context.request.body.description
+  foundUser.save()
+  context.respond.send({
+    success: true
+  })
+})
 app.use(router.routes())
