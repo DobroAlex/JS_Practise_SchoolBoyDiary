@@ -5,6 +5,7 @@ const logger = require('koa-morgan')
 const mongoose = require('mongoose')
 const koaRouter = require('koa-router')
 const koaRespond = require('koa-respond')
+const utils = require('./utils')
 const app = new koa()
 const router = new koaRouter()
 const User = require('../models/user')
@@ -39,8 +40,7 @@ router.get('/users', async (context, next) => {
 
 router.post('/users', async (context, next) => {
   // TODO: add check for bad request (no fullName & description).If occured, throw exception
-
-  if (context.request.body.fullName == null || context.request.body.fullName == '' || context.request.body.description == null || context.request.body.description == '') {
+  if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
     throw new Error('No name OR description provided')
   }
 
