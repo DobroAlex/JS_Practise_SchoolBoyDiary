@@ -63,6 +63,9 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
+  if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
+    throw new Error('No name OR description provided')
+  }
   const foundUser = await User.findById(context.params.id, 'fullName description')
   foundUser.fullName = context.request.body.fullName
   foundUser.description = context.request.body.description
