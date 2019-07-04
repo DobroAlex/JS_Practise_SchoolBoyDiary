@@ -16,12 +16,12 @@ app.use(koaRespond())
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
+const mongoAddress = 'mongodb://localhost:27017/users'
 let db
-mongoose.connect('mongodb://localhost:27017/users').then(
+mongoose.connect(mongoAddress).then(
   () => { db = mongoose.connection; console.log('Successfully connected to db') },
   err => { console.log(err); console.error('Unable to connect to db, shutting down the server'); server.close() } // this shouldn't happen normally if your mongoDB is online
 )
-
 app.use(async function handleError (context, next) {
   try {
     await next()
@@ -63,7 +63,7 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
-  const foundUser = await User.findById(context.request._id, 'fullName description')
+  const foundUser = await User.findById(context.params.id, 'fullName description')
   foundUser.fullName = context.request.body.fullName
   foundUser.description = context.request.body.description
   foundUser.save()
@@ -72,4 +72,15 @@ router.put('/users/:id', async (context, next) => {
     message: `User ${foundUser.fullName} updated`
   })
 })
+
+router.delete('/users/:id', async (context, next) => {
+  let userName
+  let foundUserCount = await User.count({ _id: context.params.id })
+  if (foundUserCount > 0) {
+    userName = await User.findById(context.params.id, 'fullName')
+    await User.findByIdAndDelete(context.params.id)
+  }
+  context.ok(`User ${userName} deleted`)
+})
+
 app.use(router.routes())
