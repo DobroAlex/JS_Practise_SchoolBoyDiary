@@ -65,10 +65,9 @@ router.get('/users/:id', async (context, next) => {
   }
 })
 
-
 router.put('/users/:id', async (context, next) => {
   if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
-    // throw new Error('No name OR description provided')
+    throw new Error('No name OR description provided \n User probably was deleted or wasn\'t created at all')
   }
   const foundUser = await User.findById(context.params.id, 'fullName description')
   if (!foundUser) {
