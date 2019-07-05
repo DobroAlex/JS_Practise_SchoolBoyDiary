@@ -28,8 +28,7 @@ app.use(async function handleError (context, next) {
   } catch (error) {
     // TODO: rework to handle different situations and notify user accordingly
     console.error(`Error occured: \n ${error}`)
-    context.status = 500
-    context.body = error.message
+    context.internalServerError(error.message)
   }
 })
 
