@@ -56,7 +56,7 @@ router.post('/users', async (context, next) => {
     'required': ['fullName', 'description']
   }
   if (!ajv.validate(schema, context.request.body)) {
-    throw new Error('Oi vey')
+    throw new Error(`${ajv.errorsText()}`)
   }
   let fullName = context.request.body.fullName
   let description = context.request.body.description
