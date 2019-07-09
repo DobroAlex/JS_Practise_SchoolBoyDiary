@@ -41,10 +41,6 @@ router.get('/users', async (context, next) => {
 })
 
 router.post('/users', async (context, next) => {
-  // TODO: add check for bad request (no fullName & description).If occured, throw exception
-  if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
-    // throw new Error('No name OR description provided')
-  }
   const schema = {
     'type': 'object',
     'properties': {
@@ -60,7 +56,7 @@ router.post('/users', async (context, next) => {
     'required': ['fullName', 'description']
   }
   if (!ajv.validate(schema, context.request.body)) {
-    throw new Error ('Oi vey')
+    throw new Error('Oi vey')
   }
   let fullName = context.request.body.fullName
   let description = context.request.body.description
