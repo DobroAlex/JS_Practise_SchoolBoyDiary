@@ -71,6 +71,20 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
+  // checking if :id is even valid
+  const schema = { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
+    'type': 'object',
+    'properties': {
+      'id': {
+        'type': 'string',
+        'pattern': '/^[0-9a-fA-F]{24}$/'
+      }
+    },
+    'required': ['id']
+  }
+  if (!ajv.validate(schema, context.params)) {
+    throw new Error('oi vey')
+  }
   const foundUser = await User.findById(context.params.id, 'fullName description')
   if (!foundUser) {
     context.notFound()
