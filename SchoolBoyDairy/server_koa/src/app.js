@@ -95,20 +95,38 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
-  // if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
-  //  throw new Error('No name OR description provided \n User probably was deleted or wasn\'t created at all')
-  // }
-  const foundUser = await User.findById(context.params.id, 'fullName description')
+  const schema = {
+    'type': 'object',
+    'properties': {
+      '_id': {
+        'type': 'string',
+        'pattern': '^[0-9a-fA-F]{24}$'
+      },
+      'fullName': {
+        'type': 'string',
+        'minLength': 1
+      },
+      'description': {
+        'type': 'string',
+        'minLength': 1
+      }
+    },
+    'required': ['_id', 'fullName', 'description']
+  }
+  if (!ajv.compile(schema, context.request.body)) {
+    throw new Error(`${ajv.errorsText()}`)
+  }
+  const foundUser = await User.findById(context.request.body._id, 'fullName description')
   if (!foundUser) {
     context.notFound()
-    return
+  } else {
+    foundUser.fullName = context.request.body.fullName
+    foundUser.description = context.request.body.description
+    foundUser.save()
+    context.ok({
+      message: `User ${foundUser.fullName} updated`
+    })
   }
-  foundUser.fullName = context.request.body.fullName
-  foundUser.description = context.request.body.description
-  foundUser.save()
-  context.ok({
-    message: `User ${foundUser.fullName} updated`
-  })
 })
 
 router.delete('/users/:id', async (context, next) => {
