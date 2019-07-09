@@ -12,6 +12,9 @@ const User = require('../models/user')
 app.use(logger('dev'))
 app.use(bodyParser())
 app.use(koaRespond())
+const Ajv = require('ajv')
+const ajv = new Ajv({ allErrors: true })
+
 // app.use(cors());
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
@@ -42,7 +45,23 @@ router.post('/users', async (context, next) => {
   if (utils.IsStingNullOrEmpty(context.request.body.fullName) || utils.IsStingNullOrEmpty(context.request.body.description)) {
     // throw new Error('No name OR description provided')
   }
-
+  const schema = {
+    'type': 'object',
+    'properties': {
+      'fullName': {
+        'type': 'string',
+        'minLength': 1
+      },
+      'description': {
+        'type': 'string',
+        'minLength': 1
+      }
+    },
+    'required': ['fullName', 'description']
+  }
+  if (!ajv.validate(schema, context.request.body)) {
+    throw new Error ('Oi vey')
+  }
   let fullName = context.request.body.fullName
   let description = context.request.body.description
   let newUser = new User({
