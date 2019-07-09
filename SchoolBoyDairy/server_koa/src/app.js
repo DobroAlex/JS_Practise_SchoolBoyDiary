@@ -77,13 +77,14 @@ router.get('/users/:id', async (context, next) => {
     'properties': {
       'id': {
         'type': 'string',
-        'pattern': '/^[0-9a-fA-F]{24}$/'
+        'pattern': '^[0-9a-fA-F]{24}$'
       }
     },
     'required': ['id']
   }
+
   if (!ajv.validate(schema, context.params)) {
-    throw new Error('oi vey')
+    throw new Error(`${ajv.errorsText()}`)
   }
   const foundUser = await User.findById(context.params.id, 'fullName description')
   if (!foundUser) {
