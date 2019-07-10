@@ -14,7 +14,7 @@ app.use(bodyParser())
 app.use(koaRespond())
 const Ajv = require('ajv')
 const ajv = new Ajv({ allErrors: true })
-
+const ajvSchems = require('./ajv-schems')
 // app.use(cors());
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
@@ -41,21 +41,7 @@ router.get('/users', async (context, next) => {
 })
 
 router.post('/users', async (context, next) => {
-  const schema = {
-    'type': 'object',
-    'properties': {
-      'fullName': {
-        'type': 'string',
-        'minLength': 1
-      },
-      'description': {
-        'type': 'string',
-        'minLength': 1
-      }
-    },
-    'required': ['fullName', 'description']
-  }
-  if (!ajv.validate(schema, context.request.body)) {
+  if (!ajv.validate(ajvSchems.POST_USERS_SCHEMA, context.request.body)) {
     throw new Error(`${ajv.errorsText()}`)
   }
   let fullName = context.request.body.fullName
@@ -71,19 +57,7 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
-  // checking if :id is even valid
-  const schema = { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
-    'type': 'object',
-    'properties': {
-      'id': {
-        'type': 'string',
-        'pattern': '^[0-9a-fA-F]{24}$'
-      }
-    },
-    'required': ['id']
-  }
-
-  if (!ajv.validate(schema, context.params)) {
+  if (!ajv.validate(ajvSchems.GET_USERS_ID_SCHEMA, context.params)) {
     throw new Error(`${ajv.errorsText()}`)
   }
   const foundUser = await User.findById(context.params.id, 'fullName description')
@@ -95,25 +69,7 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
-  const schema = {
-    'type': 'object',
-    'properties': {
-      '_id': {
-        'type': 'string',
-        'pattern': '^[0-9a-fA-F]{24}$'
-      },
-      'fullName': {
-        'type': 'string',
-        'minLength': 1
-      },
-      'description': {
-        'type': 'string',
-        'minLength': 1
-      }
-    },
-    'required': ['_id', 'fullName', 'description']
-  }
-  if (!ajv.compile(schema, context.request.body)) {
+  if (!ajv.validate(ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body)) {
     throw new Error(`${ajv.errorsText()}`)
   }
   const foundUser = await User.findById(context.request.body._id, 'fullName description')
@@ -130,16 +86,19 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.delete('/users/:id', async (context, next) => {
-  if (await User.count({ _id: context.params.id }) === 0) {
-    context.notFound()
-    return
+  if (!ajv.validate(ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)) {
+    throw new Error(`${ajv.errorsText()}`)
   }
-  let foundUser = await User.findById(context.params.id)
-  let userName = foundUser.fullName
-  await User.findByIdAndDelete(context.params.id)
-  context.send(201, {
-    message: `User ${userName} deleted`
-  })
+  if (!await User.findById(context.params.id)) {
+    context.notFound()
+  } else {
+    let foundUser = await User.findById(context.params.id)
+    let userName = foundUser.fullName
+    await User.findByIdAndDelete(context.params.id)
+    context.send(201, {
+      message: `User ${userName} deleted`
+    })
+  }
 })
 
 app.use(router.routes())
