@@ -29,9 +29,8 @@ app.use(async function handleError (context, next) {
   try {
     await next()
   } catch (error) {
-    // TODO: rework to handle different situations and notify user accordingly
     console.error(`Error occured: \n ${error}`)
-    context.internalServerError(error.message)
+    context.send(context.status, `${error}`)
   }
 })
 
@@ -42,6 +41,7 @@ router.get('/users', async (context, next) => {
 
 router.post('/users', async (context, next) => {
   if (!ajv.validate(ajvSchems.POST_USERS_SCHEMA, context.request.body)) {
+    context.status = 400
     throw new Error(`${ajv.errorsText()}`)
   }
   let fullName = context.request.body.fullName
@@ -58,6 +58,7 @@ router.post('/users', async (context, next) => {
 
 router.get('/users/:id', async (context, next) => {
   if (!ajv.validate(ajvSchems.GET_USERS_ID_SCHEMA, context.params)) {
+    context.status = 404
     throw new Error(`${ajv.errorsText()}`)
   }
   const foundUser = await User.findById(context.params.id, 'fullName description')
@@ -70,6 +71,7 @@ router.get('/users/:id', async (context, next) => {
 
 router.put('/users/:id', async (context, next) => {
   if (!ajv.validate(ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body)) {
+    context.status = 400
     throw new Error(`${ajv.errorsText()}`)
   }
   const foundUser = await User.findById(context.request.body._id, 'fullName description')
@@ -87,6 +89,7 @@ router.put('/users/:id', async (context, next) => {
 
 router.delete('/users/:id', async (context, next) => {
   if (!ajv.validate(ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)) {
+    context.status = 400
     throw new Error(`${ajv.errorsText()}`)
   }
   if (!await User.findById(context.params.id)) {
