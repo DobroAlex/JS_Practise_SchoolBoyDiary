@@ -25,6 +25,7 @@ mongoose.connect(mongoAddress).then(
   () => { db = mongoose.connection; console.log('Successfully connected to db') },
   err => { console.log(err); console.error('Unable to connect to db, shutting down the server'); server.close() } // this shouldn't happen normally if your mongoDB is online
 )
+
 app.use(async function handleError (context, next) {
   try {
     await next()
@@ -35,7 +36,7 @@ app.use(async function handleError (context, next) {
 })
 
 router.get('/users', async (context, next) => {
-  const foundUsers = await User.find({}, 'fullName description').sort({ _id: -1 })
+  const foundUsers = await User.find({}, 'fullName description school class').sort({ _id: -1 })
   context.ok({ users: foundUsers })
 })
 
@@ -44,15 +45,16 @@ router.post('/users', async (context, next) => {
     context.status = 400
     throw new Error(`${ajv.errorsText()}`)
   }
-  let fullName = context.request.body.fullName
-  let description = context.request.body.description
+  let requestBody = context.request.body
   let newUser = new User({
-    fullName: fullName,
-    description: description
+    fullName: requestBody.fullName,
+    description: requestBody.description,
+    school: requestBody.school,
+    class: requestBody.class
   })
   await newUser.save()
   context.send(201, {
-    message: `User ${fullName} saved successfuly`
+    message: `User ${requestBody.fullName} saved successfuly`
   })
 })
 
@@ -74,12 +76,15 @@ router.put('/users/:id', async (context, next) => {
     context.status = 400
     throw new Error(`${ajv.errorsText()}`)
   }
-  const foundUser = await User.findById(context.request.body._id, 'fullName description')
+  const foundUser = await User.findById(context.request.body._id, 'fullName description school class')
   if (!foundUser) {
     context.notFound()
   } else {
-    foundUser.fullName = context.request.body.fullName
-    foundUser.description = context.request.body.description
+    let requestBody = context.request.body
+    foundUser.fullName = requestBody.fullName
+    foundUser.description = requestBody.description
+    foundUser.school = requestBody.school
+    foundUser.class = requestBody.class
     foundUser.save()
     context.ok({
       message: `User ${foundUser.fullName} updated`
