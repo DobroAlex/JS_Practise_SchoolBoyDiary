@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const koaRouter = require('koa-router')
 const koaRespond = require('koa-respond')
 const utils = require('./utils')
+const validator = require('./validator')
 const app = new koa()
 const router = new koaRouter()
 const User = require('../models/user')
@@ -41,10 +42,11 @@ router.get('/users', async (context, next) => {
 })
 
 router.post('/users', async (context, next) => {
-  if (!ajv.validate(ajvSchems.POST_USERS_SCHEMA, context.request.body)) {
+  /* if (!ajv.validate(ajvSchems.POST_USERS_SCHEMA, context.request.body)) {
     context.status = 400
     throw new Error(`${ajv.errorsText()}`)
-  }
+  } */
+  await validator.validate(ajv, ajvSchems.POST_USERS_SCHEMA, context.request.body, context)
   let requestBody = context.request.body
   let newUser = new User({
     fullName: requestBody.fullName,
@@ -59,10 +61,11 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
-  if (!ajv.validate(ajvSchems.GET_USERS_ID_SCHEMA, context.params)) {
+  /* if (!ajv.validate(ajvSchems.GET_USERS_ID_SCHEMA, context.params)) {
     context.status = 404
     throw new Error(`${ajv.errorsText()}`)
-  }
+  } */
+  await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404) // TODO: fix
   const foundUser = await User.findById(context.params.id, 'fullName description')
   if (!foundUser) {
     context.notFound()
@@ -72,10 +75,11 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
-  if (!ajv.validate(ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body)) {
+  /* if (!ajv.validate(ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body)) {
     context.status = 400
     throw new Error(`${ajv.errorsText()}`)
-  }
+  } */
+  await validator.validate(ajv, ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body, 400)
   const foundUser = await User.findById(context.request.body._id, 'fullName description school class')
   if (!foundUser) {
     context.notFound()
