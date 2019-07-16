@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-  class_of_school_regex: new RegExp('^\d-[а-я]{1}|university$'), // doesn't work at the moment
+  class_of_school_regex: new RegExp('^\\d-[а-я]{1}|university$'), // doesn't work at the moment
   POST_USERS_SCHEMA: {
     id: 'POST_USERS_SCHEMA',
     type: 'object',
@@ -18,7 +18,7 @@ module.exports = Object.freeze({
       },
       class: {
         type: 'string',
-        pattern: '^\d-[а-я]{1}|university$'
+        pattern: '^\\d-[а-я]{1}|university$'
       }
     },
     required: ['fullName', 'description', 'school', 'class']
@@ -56,7 +56,7 @@ module.exports = Object.freeze({
       },
       class: {
         type: 'string',
-        pattern: '^\d-[а-я]{1}|university$'
+        pattern: '^\\d-[а-я]{1}|university$'
       }
     },
     required: ['_id', 'fullName', 'description', 'school', 'class']
