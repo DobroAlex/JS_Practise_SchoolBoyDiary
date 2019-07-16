@@ -42,10 +42,6 @@ router.get('/users', async (context, next) => {
 })
 
 router.post('/users', async (context, next) => {
-  /* if (!ajv.validate(ajvSchems.POST_USERS_SCHEMA, context.request.body)) {
-    context.status = 400
-    throw new Error(`${ajv.errorsText()}`)
-  } */
   await validator.validate(ajv, ajvSchems.POST_USERS_SCHEMA, context.request.body, context)
   let requestBody = context.request.body
   let newUser = new User({
@@ -61,56 +57,36 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
-  /* if (!ajv.validate(ajvSchems.GET_USERS_ID_SCHEMA, context.params)) {
-    context.status = 404
-    throw new Error(`${ajv.errorsText()}`)
-  } */
-  await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404) // TODO: fix
+  await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404)
+  await validator.validateID(User, context.params.id, context)
   const foundUser = await User.findById(context.params.id, 'fullName description')
-  if (!foundUser) {
-    context.notFound()
-  } else {
-    context.ok(foundUser)
-  }
+  context.ok(foundUser)
 })
 
 router.put('/users/:id', async (context, next) => {
-  /* if (!ajv.validate(ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body)) {
-    context.status = 400
-    throw new Error(`${ajv.errorsText()}`)
-  } */
   await validator.validate(ajv, ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body, 400)
+  await validator.validateID(User, context.request.body._id, context)
   const foundUser = await User.findById(context.request.body._id, 'fullName description school class')
-  if (!foundUser) {
-    context.notFound()
-  } else {
-    let requestBody = context.request.body
-    foundUser.fullName = requestBody.fullName
-    foundUser.description = requestBody.description
-    foundUser.school = requestBody.school
-    foundUser.class = requestBody.class
-    foundUser.save()
-    context.ok({
-      message: `User ${foundUser.fullName} updated`
-    })
-  }
+  let requestBody = context.request.body
+  foundUser.fullName = requestBody.fullName
+  foundUser.description = requestBody.description
+  foundUser.school = requestBody.school
+  foundUser.class = requestBody.class
+  foundUser.save()
+  context.ok({
+    message: `User ${foundUser.fullName} updated`
+  })
 })
 
 router.delete('/users/:id', async (context, next) => {
-  if (!ajv.validate(ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)) {
-    context.status = 400
-    throw new Error(`${ajv.errorsText()}`)
-  }
-  if (!await User.findById(context.params.id)) {
-    context.notFound()
-  } else {
-    let foundUser = await User.findById(context.params.id)
-    let userName = foundUser.fullName
-    await User.findByIdAndDelete(context.params.id)
-    context.send(201, {
-      message: `User ${userName} deleted`
-    })
-  }
+  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)
+  await validator.validateID(User, context.params.id)
+  let foundUser = await User.findById(context.params.id)
+  let userName = foundUser.fullName
+  await User.findByIdAndDelete(context.params.id)
+  context.send(201, {
+    message: `User ${userName} deleted`
+  })
 })
 
 app.use(router.routes())
