@@ -41,7 +41,7 @@ app.use(async function handleError (context, next) {
   }
 })
 app.use(jwt({
-  secret: utils.SECRET
+  secret: jwtUtils.JWT_SECRET
 }).unless({
   path: [/^\/public/, '/']
 }))
