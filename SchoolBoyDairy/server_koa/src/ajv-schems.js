@@ -71,5 +71,32 @@ module.exports = Object.freeze({
       }
     },
     required: ['_id']
+  },
+  REGISTER_USER_SCHEMA: {
+    id: 'REGISTER_USER_SCHEMA',
+    type: 'object',
+    properties: {
+      fullName: {
+        type: 'string',
+        minLength: 1
+      },
+      school: {
+        type: 'string',
+        minLength: 1
+      },
+      class: {
+        type: 'string',
+        pattern: '^\\d-[а-я]{1}|university$'
+      },
+      password: {
+        type: 'string',
+        pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$' // https://stackoverflow.com/questions/14850553/javascript-regex-for-password-containing-at-least-8-characters-1-number-1-uppe
+      },
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      }
+    },
+    required: ['fullName', 'school', 'class', 'password', 'email']
   }
 })
