@@ -14,5 +14,14 @@ module.exports = {
       context.status = 404
       throw new Error(`No such user with id: ${id}`)
     }
+  },
+  IsFreeEmail: async function (Model, email, context) {
+    const count = await Model.countDocuments({ mail: email })
+    if (!count) {
+      return true
+    } else {
+      context.error = 422
+      throw new Error(`E-mail ${email} has already been taken`)
+    }
   }
 }
