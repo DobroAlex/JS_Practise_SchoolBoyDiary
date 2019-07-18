@@ -98,5 +98,17 @@ module.exports = Object.freeze({
       }
     },
     required: ['fullName', 'school', 'class', 'password', 'email']
-  }
+  },
+  LOGIN_USER_SCHEMA: {
+    id: 'LOGIN_USER_SCHEMA',
+    email: {
+      type: 'string',
+      pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+    },
+    password: {
+      type: 'string',
+      pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$'
+    }
+  },
+  required: ['email', 'password']
 })
