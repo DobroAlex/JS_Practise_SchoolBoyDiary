@@ -7,7 +7,8 @@ const UserSchmea = new Schema({
   school: String,
   class: String,
   phoneNumber: String,
-  mail: String
+  mail: String,
+  password: String
 })
 
 const User = mongoose.model('User', UserSchmea)
