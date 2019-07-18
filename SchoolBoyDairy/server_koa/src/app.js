@@ -2,7 +2,6 @@ const koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 // const cors = require('cors');
 const logger = require('koa-morgan')
-const mongoose = require('mongoose')
 const koaRouter = require('koa-router')
 const koaRespond = require('koa-respond')
 const jwt = require('koa-jwt')
@@ -10,6 +9,7 @@ const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const utils = require('./utils')
 const validator = require('./validator')
+const mongoconnection = require('./mongoconnection')
 const app = new koa()
 const router = new koaRouter()
 const User = require('../models/user')
@@ -23,12 +23,14 @@ const ajvSchems = require('./ajv-schems')
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
-const mongoAddress = 'mongodb://localhost:27017/users'
 let db
-mongoose.connect(mongoAddress).then(
-  () => { db = mongoose.connection; console.log('Successfully connected to db') },
-  err => { console.log(err); console.error('Unable to connect to db, shutting down the server'); server.close() } // this shouldn't happen normally if your mongoDB is online
-)
+try {
+  db = mongoconnection.connectToMongo(mongoconnection.MONGO_ADDRESS)
+  console.log(`Connected to Mongo`)
+} catch (e) {
+  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_ADDRESS}: \n ${e}`)
+  server.close()
+}
 
 app.use(async function handleError (context, next) {
   try {
@@ -38,7 +40,6 @@ app.use(async function handleError (context, next) {
     context.send(context.status, `${error}`)
   }
 })
-
 app.use(jwt({
   secret: utils.SECRET
 }).unless({
