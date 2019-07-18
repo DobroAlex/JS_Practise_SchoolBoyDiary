@@ -5,11 +5,11 @@ const logger = require('koa-morgan')
 const koaRouter = require('koa-router')
 const koaRespond = require('koa-respond')
 const jwt = require('koa-jwt')
-const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const utils = require('./utils')
 const validator = require('./validator')
 const mongoconnection = require('./mongoconnection')
+const jwtUtils = require('./jwt-utils')
 const app = new koa()
 const router = new koaRouter()
 const User = require('../models/user')
@@ -68,6 +68,24 @@ router.post('/public/register', async (context, next) => {
   context.send(201, {
     message: `User ${requestBody.fullName} (${requestBody.email} saved)`
   })
+})
+
+router.post('/public/login', async (context, next) => {
+  await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
+  const foundUser = await User.find({ mail: context.request.body.email }, '_id fullName password mail')
+  if (!foundUser.length) {
+    context.status = 404
+    throw new Error(`No user ${context.request.body.email} has been found`)
+  }
+  if (await bcrypt.compare(context.request.body.password, foundUser[0].password)) {
+    context.send(200, {
+      token: jwtUtils.newAccesssToken({ email: context.request.body.email, role: foundUser[0]._id }),
+      _id: foundUser[0]._id
+    })
+  } else {
+    context.status = 403
+    throw new Error('Incorrect password')
+  }
 })
 
 router.get('/users', async (context, next) => {
