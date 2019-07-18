@@ -39,6 +39,36 @@ app.use(async function handleError (context, next) {
   }
 })
 
+app.use(jwt({
+  secret: utils.SECRET
+}).unless({
+  path: [/^\/public/, '/']
+}))
+
+app.use(async (ctx, next) => {
+  const start = Date.now()
+  await next()
+  const ms = Date.now() - start
+  ctx.set('X-Response-Time', `${ms}ms`)
+})
+
+router.post('/public/register', async (context, next) => {
+  await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
+  const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
+  const requestBody = context.request.body
+  await validator.IsFreeEmail(User, requestBody.email, context)
+  let newUser = new User({
+    fullName: requestBody.fullName,
+    school: requestBody.school,
+    mail: requestBody.email,
+    password: hashedPass
+  })
+  await newUser.save()
+  context.send(201, {
+    message: `User ${requestBody.fullName} (${requestBody.email} saved)`
+  })
+})
+
 router.get('/users', async (context, next) => {
   const foundUsers = await User.find({}, 'fullName description school class').sort({ _id: -1 })
   context.ok({ users: foundUsers })
