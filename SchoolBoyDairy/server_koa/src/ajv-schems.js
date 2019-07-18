@@ -1,4 +1,4 @@
-module.exports = Object.freeze({
+module.exports = Object.freeze({ // TODO I liked this Object.freeze!
   class_of_school_regex: new RegExp('^\\d-[а-я]{1}|university$'), // doesn't work at the moment
   POST_USERS_SCHEMA: {
     id: 'POST_USERS_SCHEMA',

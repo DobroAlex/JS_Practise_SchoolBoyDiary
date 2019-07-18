@@ -1,3 +1,5 @@
+// TODO Use extra empty line to emphasize 'require' logic blocs
+// and rearrange 'require' blocks and function calls
 const koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 // const cors = require('cors');
@@ -23,6 +25,7 @@ const ajvSchems = require('./ajv-schems')
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
+// TODO better move mongo connection to separate file
 const mongoAddress = 'mongodb://localhost:27017/users'
 let db
 mongoose.connect(mongoAddress).then(
@@ -53,9 +56,12 @@ app.use(async (ctx, next) => {
 })
 
 router.post('/public/register', async (context, next) => {
+  // TODO you may unite two validation functions. It will look better
+
   await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
+  // TODO Use extra empty lines between logical code blocks. It is more readable
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
-  const requestBody = context.request.body
+  const requestBody = context.request.body // you may use destructuring for easier variables usage. Example below
   await validator.IsFreeEmail(User, requestBody.email, context)
   let newUser = new User({
     fullName: requestBody.fullName,
@@ -68,6 +74,29 @@ router.post('/public/register', async (context, next) => {
     message: `User ${requestBody.fullName} (${requestBody.email} saved)`
   })
 })
+
+// I did not test it. May contain bugs
+// router.post('/public/register', async (context, next) => {
+//   await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
+
+//   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
+//   const { fullName, school, mail } = context.request.body 
+
+//   await validator.IsFreeEmail(User, email, context)
+
+//   let newUser = new User({
+//     fullName,
+//     school,
+//     mail,
+//     password: hashedPass
+//   })
+
+//   await newUser.save()
+
+//   context.send(201, {
+//     message: `User ${fullName} (${email} saved)`
+//   })
+// })
 
 router.get('/users', async (context, next) => {
   const foundUsers = await User.find({}, 'fullName description school class').sort({ _id: -1 })

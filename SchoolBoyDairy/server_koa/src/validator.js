@@ -1,11 +1,11 @@
 module.exports = {
   validate: async function (ajvInstance, schema, data, context, statusCode = 400) {
-    if (!ajvInstance.validate(schema, data)) {
-      context.status = statusCode
-      throw new Error(`${ajvInstance.errorsText()}`)
-    } else {
-      return true
-    }
+    // TODO Here you first opposite condition you may get rid of extra code block. Like i`ve just done
+    // Of course if there was no other cases which was processed in previous realization
+    if (ajvInstance.validate(schema, data)) return true
+
+    context.status = statusCode
+    throw new Error(`${ajvInstance.errorsText()}`)
   },
   validateID: async function (Model, id, context) {
     try {
