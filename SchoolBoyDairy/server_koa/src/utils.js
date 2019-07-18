@@ -1,10 +1,8 @@
 module.exports = {
   IsStingNullOrEmpty: async function (str) {
-    if (str === null || str === '' || str === undefined) {
-      return true
-    }
-    return false
+    return (str === null || str === '' || str === undefined)
   },
+
   SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
   'b81a108d011c9e241bcc9627ad08355defaef1660f2bed51fbb810bed0cd759eb519b83fe633a50e' +
   '74e3a6465224ca23f2bfbb50c8edaa84864a8be1b0cea799352fe11dad0bf73660c924c97bef82bf' +
