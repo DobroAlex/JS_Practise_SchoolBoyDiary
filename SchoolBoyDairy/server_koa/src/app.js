@@ -36,7 +36,7 @@ app.use(async function handleError (context, next) {
   try {
     await next()
   } catch (error) {
-    console.error(`Error occured: \n ${error}`)
+    console.error(`Error occured: \n ${error} \n ${error.stack}`)
     context.send(context.status, `${error}`)
   }
 })
