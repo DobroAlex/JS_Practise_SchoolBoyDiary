@@ -113,19 +113,21 @@ router.post('/users', async (context, next) => {
 router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
   await validator.validate(ajv, ajvSchems.GET_ME_SCHEMA, decoded, context, 404)
-  const foundUser = await User.find({ mail: decoded.email }, 'fullName description')
+  const foundUser = await User.find({ mail: decoded.email }, 'fullName description school class email')
   context.ok(foundUser[0])
 })
 
-router.put('/users/:id', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body, 400)
-  await validator.validateID(User, context.request.body._id, context)
-  const foundUser = await User.findById(context.request.body._id, 'fullName description school class')
+router.put('/me', async (context, next) => {
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+  await validator.validate(ajv, ajvSchems.GET_ME_SCHEMA, decoded, context, 400)
+  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context)
+  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class email'))[0]
   let requestBody = context.request.body
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
+  foundUser.mail = requestBody.email
   foundUser.save()
   context.ok({
     message: `User ${foundUser.fullName} updated`
