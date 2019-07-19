@@ -29,7 +29,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$' // checking if :id is even valid
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
       },
       role: {
         type: 'string',
