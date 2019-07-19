@@ -5,6 +5,7 @@ const logger = require('koa-morgan')
 const koaRouter = require('koa-router')
 const koaRespond = require('koa-respond')
 const jwt = require('koa-jwt')
+const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const utils = require('./utils')
 const validator = require('./validator')
@@ -79,9 +80,11 @@ router.post('/public/login', async (context, next) => {
   }
   if (await bcrypt.compare(context.request.body.password, foundUser[0].password)) {
     context.send(200, {
-      token: jwtUtils.newAccesssToken({ email: context.request.body.email, role: foundUser[0]._id }),
-      _id: foundUser[0]._id
-    })
+      token: jwtUtils.newAccesssToken({ email: context.request.body.email,
+        role: 'user',
+        owner: foundUser[0]._id }),
+      _id: foundUser[0]._id }
+    )
   } else {
     context.status = 403
     throw new Error('Incorrect password')
@@ -109,6 +112,12 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
+  console.log(jwtUtils.getTokenFromHeader(context))
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+  if (decoded.owner !== context.params.id) {
+    context.status = 403
+    throw new Error('Token owner and user dosen\'t match')
+  }
   await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404)
   await validator.validateID(User, context.params.id, context)
   const foundUser = await User.findById(context.params.id, 'fullName description')
