@@ -38,14 +38,10 @@ module.exports = Object.freeze({
     },
     required: ['email', 'role']
   },
-  PUT_USERS_ID_SCHEMA: {
-    id: 'PUT_USERS_ID_SCHEMA',
+  PUT_ME_SCHEMA: {
+    id: 'PUT_ME_SCHEMA',
     type: 'object',
     properties: {
-      _id: {
-        type: 'string',
-        pattern: '^[0-9a-fA-F]{24}$'
-      },
       fullName: {
         type: 'string',
         minLength: 1
