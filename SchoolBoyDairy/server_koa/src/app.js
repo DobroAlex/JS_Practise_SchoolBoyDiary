@@ -80,10 +80,9 @@ router.post('/public/login', async (context, next) => {
   }
   if (await bcrypt.compare(context.request.body.password, foundUser[0].password)) {
     context.send(200, {
-      token: jwtUtils.newAccesssToken({ email: context.request.body.email,
-        role: 'user',
-        owner: foundUser[0]._id }),
-      _id: foundUser[0]._id }
+      token: jwtUtils.newAccesssToken({
+        email: context.request.body.email,
+        role: 'user' }) }
     )
   } else {
     context.status = 403
@@ -111,17 +110,11 @@ router.post('/users', async (context, next) => {
   })
 })
 
-router.get('/users/:id', async (context, next) => {
-  console.log(jwtUtils.getTokenFromHeader(context))
+router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  if (decoded.owner !== context.params.id) {
-    context.status = 403
-    throw new Error('Token owner and user dosen\'t match')
-  }
-  await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404)
-  await validator.validateID(User, context.params.id, context)
-  const foundUser = await User.findById(context.params.id, 'fullName description')
-  context.ok(foundUser)
+  await validator.validate(ajv, ajvSchems.GET_ME_SCHEMA, decoded, context, 404)
+  const foundUser = await User.find({ mail: decoded.email }, 'fullName description')
+  context.ok(foundUser[0])
 })
 
 router.put('/users/:id', async (context, next) => {

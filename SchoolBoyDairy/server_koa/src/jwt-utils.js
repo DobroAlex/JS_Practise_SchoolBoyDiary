@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 module.exports = {
-  newAccesssToken: function ({ email, role, owner }) {
-    return jwt.sign({ email, role, owner }, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+  newAccesssToken: function ({ email, role }) {
+    return jwt.sign({ email, role }, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
   },
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
     return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })

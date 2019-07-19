@@ -23,16 +23,20 @@ module.exports = Object.freeze({
     },
     required: ['fullName', 'description', 'school', 'class']
   },
-  GET_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
-    id: 'GET_USERS_ID_SCHEMA',
+  GET_ME_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
+    id: 'GET_ME_SCHEMA',
     type: 'object',
     properties: {
-      id: {
+      email: {
         type: 'string',
-        pattern: '^[0-9a-fA-F]{24}$' // checking if :id is even valid
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$' // checking if :id is even valid
+      },
+      role: {
+        type: 'string',
+        minLength: 1
       }
     },
-    required: ['id']
+    required: ['email', 'role']
   },
   PUT_USERS_ID_SCHEMA: {
     id: 'PUT_USERS_ID_SCHEMA',
