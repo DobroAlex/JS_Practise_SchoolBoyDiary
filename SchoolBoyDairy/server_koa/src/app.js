@@ -1,24 +1,30 @@
 const koa = require('koa')
+const app = new koa()
+
 const bodyParser = require('koa-bodyparser')
-// const cors = require('cors');
 const logger = require('koa-morgan')
+
 const koaRouter = require('koa-router')
+const router = new koaRouter()
+
 const koaRespond = require('koa-respond')
 const jwt = require('koa-jwt')
 const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+
+const Ajv = require('ajv')
+const ajv = new Ajv({ allErrors: true })
+
 const utils = require('./utils')
 const validator = require('./validator')
 const mongoconnection = require('./mongoconnection')
 const jwtUtils = require('./jwt-utils')
-const app = new koa()
-const router = new koaRouter()
 const User = require('../models/user')
+
 app.use(logger('dev'))
 app.use(bodyParser())
 app.use(koaRespond())
-const Ajv = require('ajv')
-const ajv = new Ajv({ allErrors: true })
+
 const ajvSchems = require('./ajv-schems')
 // app.use(cors());
 const server = app.listen(8081 || process.env.PORT)
@@ -41,6 +47,7 @@ app.use(async function handleError (context, next) {
     context.send(context.status, `${error}`)
   }
 })
+
 app.use(jwt({
   secret: jwtUtils.JWT_SECRET
 }).unless({
@@ -56,8 +63,11 @@ app.use(async (ctx, next) => {
 
 router.post('/public/register', async (context, next) => {
   await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
+
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
+
   const requestBody = context.request.body
+
   await validator.IsFreeEmail(User, requestBody.email, context)
   let newUser = new User({
     fullName: requestBody.fullName,
@@ -78,11 +88,13 @@ router.post('/public/register', async (context, next) => {
 
 router.post('/public/login', async (context, next) => {
   await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
+
   const foundUser = (await User.find({ mail: context.request.body.email }, 'fullName password mail role'))[0]
   if (!foundUser) {
     context.status = 404
     throw new Error(`No user ${context.request.body.email} has been found`)
   }
+
   if (await bcrypt.compare(context.request.body.password, foundUser.password)) {
     context.send(200, {
       token: jwtUtils.newAccessToken({
@@ -97,13 +109,17 @@ router.post('/public/login', async (context, next) => {
 
 router.get('/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
   const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
+
   context.ok({ users: foundUsers })
 })
 
 router.post('admin/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
   await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
+
   let requestBody = context.request.body
   let newUser = new User({
     fullName: requestBody.fullName,
@@ -114,6 +130,7 @@ router.post('admin/users', async (context, next) => {
     role: requestBody.role, // admins may create other admins
     phoneNumber: requestBody.phoneNumber
   })
+
   await newUser.save()
   context.send(201, {
     message: `User ${requestBody.fullName} saved successfuly`
@@ -122,15 +139,20 @@ router.post('admin/users', async (context, next) => {
 
 router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
+
   const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class email phoneNumber role'))[0]
+
   context.ok(foundUser)
 })
 
 router.put('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating tokem
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating token
+
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
+
   const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class mail'))[0]
   let requestBody = context.request.body
   foundUser.fullName = requestBody.fullName
@@ -146,12 +168,14 @@ router.put('/me', async (context, next) => {
 })
 
 router.delete('/users/:id', async (context, next) => { // admin wants to delete user
-  const decoded = await jwtUtils.validateAdminRoleAndToken(context, ajv)
   await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
+
   await validator.validateID(User, context.params.id)
+
   const foundUser = (await User.findById(context.params.id))
   const userName = foundUser.fullName
   const userMail = foundUser.mail
+
   await User.findByIdAndDelete(context.params.id)
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`
@@ -160,13 +184,17 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 
 router.delete('/me', async (context, next) => { // user wants to delete self
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+
   await validator.validateID(User, (await User.find({ mail: decoded.email }))[0]._id, context)
+
   const foundUser = (await User.find({ mail: decoded.email }))[0]
   const userName = foundUser.fullName
   const userMail = foundUser.mail
+
   await User.findByIdAndDelete(foundUser._id)
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`
   })
 })
+
 app.use(router.routes())

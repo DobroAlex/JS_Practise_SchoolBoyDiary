@@ -10,6 +10,7 @@ module.exports = {
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
     return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
   },
+
   getTokenFromHeader: function (context) {
     if (!context.request.header.authorization || !context.request.header.authorization.includes('Bearer')) {
       context.status = 400
@@ -17,10 +18,12 @@ module.exports = {
     }
     return context.request.header.authorization.split('Bearer')[1].trim()
   },
+
   isValidAdminRole: function (token) {
     const decoded = this.verifyAccessToken(token)
     return (decoded && (decoded.role === 'admin'))
   },
+
   validateAdminRoleAndToken: async function (context, ajv) { // Probably not the best practice in terms of OOP
     const decoded = this.verifyAccessToken(this.getTokenFromHeader(context))
 
@@ -30,7 +33,9 @@ module.exports = {
     }
     return decoded
   },
+
   defaultExpireTime: '30m',
+
   JWT_SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
   'b81a108d011c9e241bcc9627ad08355defaef1660f2bed51fbb810bed0cd759eb519b83fe633a50e' +
   '74e3a6465224ca23f2bfbb50c8edaa84864a8be1b0cea799352fe11dad0bf73660c924c97bef82bf' +
