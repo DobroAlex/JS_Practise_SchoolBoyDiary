@@ -96,18 +96,23 @@ router.post('/public/login', async (context, next) => {
 })
 
 router.get('/users', async (context, next) => {
-  const foundUsers = await User.find({}, 'fullName description school class').sort({ _id: -1 })
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
   context.ok({ users: foundUsers })
 })
 
-router.post('/users', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.POST_USERS_SCHEMA, context.request.body, context)
+router.post('admin/users', async (context, next) => {
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
   let requestBody = context.request.body
   let newUser = new User({
     fullName: requestBody.fullName,
     description: requestBody.description,
     school: requestBody.school,
-    class: requestBody.class
+    class: requestBody.class,
+    mail: requestBody.email,
+    role: requestBody.role, // admins may create other admins
+    phoneNumber: requestBody.phoneNumber
   })
   await newUser.save()
   context.send(201, {
