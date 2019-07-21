@@ -1,8 +1,12 @@
 const jwt = require('jsonwebtoken')
+const ajvSchems = require('./ajv-schems')
+const validator = require('./validator')
+
 module.exports = {
-  newAccesssToken: function ({ email, role }) {
+  newAccessToken: function ({ email, role }) {
     return jwt.sign({ email, role }, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
   },
+
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
     return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
   },
@@ -12,6 +16,19 @@ module.exports = {
       throw new Error('Requset dosen\'t contains token')
     }
     return context.request.header.authorization.split('Bearer')[1].trim()
+  },
+  isValidAdminRole: function (token) {
+    const decoded = this.verifyAccessToken(token)
+    return (decoded && (decoded.role === 'admin'))
+  },
+  validateAdminRoleAndToken: async function (context, ajv) { // Probably not the best practice in terms of OOP
+    const decoded = this.verifyAccessToken(this.getTokenFromHeader(context))
+
+    if (!await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 403) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
+      context.status = 403
+      throw new Error(`Attempt to reach admin page while not being one for ${this.verifyAccessToken(this.getTokenFromHeader(context)).email}`)
+    }
+    return decoded
   },
   defaultExpireTime: '30m',
   JWT_SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
