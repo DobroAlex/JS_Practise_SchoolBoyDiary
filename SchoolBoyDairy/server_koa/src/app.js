@@ -122,37 +122,51 @@ router.post('admin/users', async (context, next) => {
 
 router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajv, ajvSchems.GET_ME_SCHEMA, decoded, context, 404)
-  const foundUser = await User.find({ mail: decoded.email }, 'fullName description school class email')
-  context.ok(foundUser[0])
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
+  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class email phoneNumber role'))[0]
+  context.ok(foundUser)
 })
 
 router.put('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajv, ajvSchems.GET_ME_SCHEMA, decoded, context, 400)
-  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context)
-  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class email'))[0]
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating tokem
+  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
+  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class mail'))[0]
   let requestBody = context.request.body
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
   foundUser.mail = requestBody.email
+  foundUser.phoneNumber = requestBody.phoneNumber
   foundUser.save()
   context.ok({
-    message: `User ${foundUser.fullName} updated`
+    message: `User ${foundUser.fullName} : ${foundUser.mail} updated`
   })
 })
 
-router.delete('/users/:id', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)
+router.delete('/users/:id', async (context, next) => { // admin wants to delete user
+  const decoded = await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
   await validator.validateID(User, context.params.id)
-  let foundUser = await User.findById(context.params.id)
-  let userName = foundUser.fullName
+  const foundUser = (await User.findById(context.params.id))
+  const userName = foundUser.fullName
+  const userMail = foundUser.mail
   await User.findByIdAndDelete(context.params.id)
   context.send(201, {
-    message: `User ${userName} deleted`
+    message: `User ${userName}: ${userMail} deleted`
   })
 })
 
+router.delete('/me', async (context, next) => { // user wants to delete self
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+  await validator.validateID(User, (await User.find({ mail: decoded.email }))[0]._id, context)
+  const foundUser = (await User.find({ mail: decoded.email }))[0]
+  const userName = foundUser.fullName
+  const userMail = foundUser.mail
+  await User.findByIdAndDelete(foundUser._id)
+  context.send(201, {
+    message: `User ${userName}: ${userMail} deleted`
+  })
+})
 app.use(router.routes())
