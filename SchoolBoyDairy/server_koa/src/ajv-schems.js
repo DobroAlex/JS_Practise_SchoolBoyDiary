@@ -35,33 +35,37 @@ module.exports = Object.freeze({
         type: 'string',
         pattern: '^\\d-[а-я]{1}|university$'
       },
+      phoneNumber: {
+        type: 'string',
+        pattern: '^\\+\\d{11}$'
+      },
       email: {
         type: 'string',
         pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
-      },
-      role: {
-        type: 'string',
-        minLength: 1
       }
     },
-    required: ['fullName', 'description', 'school', 'class', 'email']
+    required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber']
   },
   DELETE_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
     id: 'DELETE_USERS_ID_SCHEMA',
     type: 'object',
     properties: {
-      _id: {
+      id: {
         type: 'string',
         pattern: '^[0-9a-fA-F]{24}$' // checking if :id is even valid
       }
     },
-    required: ['_id']
+    required: ['id']
   },
   REGISTER_USER_SCHEMA: {
     id: 'REGISTER_USER_SCHEMA',
     type: 'object',
     properties: {
       fullName: {
+        type: 'string',
+        minLength: 1
+      },
+      description: {
         type: 'string',
         minLength: 1
       },
@@ -80,20 +84,41 @@ module.exports = Object.freeze({
       email: {
         type: 'string',
         pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      phoneNumber: {
+        type: 'string',
+        pattern: '^\\+\\d{11}$'
       }
     },
-    required: ['fullName', 'school', 'class', 'password', 'email']
+    required: ['fullName', 'description', 'school', 'class', 'password', 'email', 'phoneNumber']
   },
   LOGIN_USER_SCHEMA: {
     id: 'LOGIN_USER_SCHEMA',
-    email: {
-      type: 'string',
-      pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+    properties: {
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      password: {
+        type: 'string',
+        pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$'
+      }
     },
-    password: {
-      type: 'string',
-      pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$'
-    }
+    required: ['email', 'password']
   },
-  required: ['email', 'password']
+  POST_USER_SCHEMA: this.PUT_ME_SCHEMA, // avoding duplication
+  JWT_TOKEN_SCHEMA: {
+    id: 'JWT_TOKEN_SCHEMA',
+    properties: {
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      role: {
+        type: 'string',
+        minLength: 1
+      }
+    },
+    required: ['email', 'role']
+  }
 })
