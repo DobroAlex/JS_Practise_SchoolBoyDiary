@@ -8,7 +8,8 @@ const UserSchmea = new Schema({
   class: String,
   phoneNumber: String,
   mail: String,
-  password: String // should be stored like bcrypt.hash(plainTextPassword, utils.HashRound). DON'T save plaintext
+  password: String, // should be stored like bcrypt.hash(plainTextPassword, utils.HashRound). DON'T save plaintext
+  role: String // either user or admin
 })
 
 const User = mongoose.model('User', UserSchmea)
