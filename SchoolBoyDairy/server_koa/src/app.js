@@ -78,16 +78,16 @@ router.post('/public/register', async (context, next) => {
 
 router.post('/public/login', async (context, next) => {
   await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
-  const foundUser = await User.find({ mail: context.request.body.email }, '_id fullName password mail')
-  if (!foundUser.length) {
+  const foundUser = (await User.find({ mail: context.request.body.email }, 'fullName password mail role'))[0]
+  if (!foundUser) {
     context.status = 404
     throw new Error(`No user ${context.request.body.email} has been found`)
   }
-  if (await bcrypt.compare(context.request.body.password, foundUser[0].password)) {
+  if (await bcrypt.compare(context.request.body.password, foundUser.password)) {
     context.send(200, {
-      token: jwtUtils.newAccesssToken({
+      token: jwtUtils.newAccessToken({
         email: context.request.body.email,
-        role: 'user' }) }
+        role: foundUser.role }) }
     )
   } else {
     context.status = 403
