@@ -61,9 +61,14 @@ router.post('/public/register', async (context, next) => {
   await validator.IsFreeEmail(User, requestBody.email, context)
   let newUser = new User({
     fullName: requestBody.fullName,
+    description: requestBody.description,
     school: requestBody.school,
     mail: requestBody.email,
-    password: hashedPass
+    password: hashedPass,
+    class: requestBody.class,
+    phoneNumber: requestBody.phoneNumber,
+    role: 'user' /* by default, each new entity is a simple user. Real admin have to change his role to 'admin'
+                 via MongoDB Compass */
   })
   await newUser.save()
   context.send(201, {
