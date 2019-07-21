@@ -1,28 +1,5 @@
 module.exports = Object.freeze({
   class_of_school_regex: new RegExp('^\\d-[а-я]{1}|university$'), // doesn't work at the moment
-  POST_USERS_SCHEMA: {
-    id: 'POST_USERS_SCHEMA',
-    type: 'object',
-    properties: {
-      fullName: {
-        type: 'string',
-        minLength: 1
-      },
-      description: {
-        type: 'string',
-        minLength: 1
-      },
-      school: {
-        type: 'string',
-        minLength: 1
-      },
-      class: {
-        type: 'string',
-        pattern: '^\\d-[а-я]{1}|university$'
-      }
-    },
-    required: ['fullName', 'description', 'school', 'class']
-  },
   GET_ME_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
     id: 'GET_ME_SCHEMA',
     type: 'object',
