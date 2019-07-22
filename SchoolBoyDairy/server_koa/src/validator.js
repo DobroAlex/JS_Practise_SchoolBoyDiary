@@ -24,7 +24,7 @@ module.exports = {
   },
 
   ValidateFreeEmail: async function (Model, email, context) {
-    const count = await Model.countDocuments({ mail: email })
+    const count = await Model.countDocuments({ email: email })
     if (!count) {
       return true
     } else {
@@ -34,7 +34,7 @@ module.exports = {
   },
 
   validateEmail: async function (Model, email, context) {
-    const count = await Model.countDocuments({ mail: email })
+    const count = await Model.countDocuments({ email: email })
     if (count) {
       return true
     } else {

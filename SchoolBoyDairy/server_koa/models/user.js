@@ -7,7 +7,7 @@ const UserSchmea = new Schema({
   school: String,
   class: String,
   phoneNumber: String,
-  mail: String,
+  email: String,
   password: String, // should be stored like bcrypt.hash(plainTextPassword, utils.HashRound). DON'T save plaintext
   role: String // either user or admin
 })

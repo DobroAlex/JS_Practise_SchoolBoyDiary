@@ -73,7 +73,7 @@ router.post('/public/register', async (context, next) => {
     fullName: requestBody.fullName,
     description: requestBody.description,
     school: requestBody.school,
-    mail: requestBody.email,
+    email: requestBody.email,
     password: hashedPass,
     class: requestBody.class,
     phoneNumber: requestBody.phoneNumber,
@@ -88,7 +88,7 @@ router.post('/public/register', async (context, next) => {
 router.post('/public/login', async (context, next) => {
   await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
 
-  const foundUser = (await User.find({ mail: context.request.body.email }, 'fullName password mail role'))[0]
+  const foundUser = (await User.find({ email: context.request.body.email }, 'fullName password email role'))[0]
   if (!foundUser) {
     context.status = 404
     throw new Error(`No user ${context.request.body.email} has been found`)
@@ -125,7 +125,7 @@ router.post('/users', async (context, next) => {
     description: requestBody.description,
     school: requestBody.school,
     class: requestBody.class,
-    mail: requestBody.email,
+    email: requestBody.email,
     role: requestBody.role, // admins may create other admins
     phoneNumber: requestBody.phoneNumber
   })
@@ -156,7 +156,7 @@ router.put('/users/:id', async (context, next) => {
   const foundUser = await User.findById(context.params.id, '')
   let requestBody = context.request.body
 
-  if (requestBody.email !== foundUser.mail) {
+  if (requestBody.email !== foundUser.email) {
     await validator.validateEmail(User, requestBody.email, context)
   }
 
@@ -176,7 +176,7 @@ router.get('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
 
-  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class email phoneNumber role'))[0]
+  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber role'))[0]
 
   context.ok(foundUser)
 })
@@ -187,10 +187,10 @@ router.put('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
 
-  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class mail phoneNumber'))[0]
+  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
   let requestBody = context.request.body
 
-  if (foundUser.mail !== requestBody.email) { // if user want's to edit his email the new one should be free
+  if (foundUser.email !== requestBody.email) { // if user want's to edit his email the new one should be free
     await validator.ValidateFreeEmail(User, requestBody.email, context)
   }
 
@@ -198,12 +198,12 @@ router.put('/me', async (context, next) => {
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
-  foundUser.mail = requestBody.email
+  foundUser.email = requestBody.email
   foundUser.phoneNumber = requestBody.phoneNumber
 
   await foundUser.save()
   context.ok({
-    message: `User ${foundUser.fullName} : ${foundUser.mail} updated`
+    message: `User ${foundUser.fullName} : ${foundUser.email} updated`
   })
 })
 
@@ -215,7 +215,7 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 
   const foundUser = await User.findById(context.params.id)
   const userName = foundUser.fullName
-  const userMail = foundUser.mail
+  const userMail = foundUser.email
 
   await User.findByIdAndDelete(context.params.id)
   context.send(201, {
@@ -228,9 +228,9 @@ router.delete('/me', async (context, next) => { // user wants to delete self
 
   await validator.validateEmail(User, decoded.email, context)
 
-  const foundUser = (await User.find({ mail: decoded.email }))[0]
+  const foundUser = (await User.find({ email: decoded.email }))[0]
   const userName = foundUser.fullName
-  const userMail = foundUser.mail
+  const userMail = foundUser.email
 
   await User.findByIdAndDelete(foundUser._id)
   context.send(201, {
