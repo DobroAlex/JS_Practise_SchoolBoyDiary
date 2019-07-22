@@ -132,10 +132,45 @@ router.post('/users', async (context, next) => {
 
   await newUser.save()
   context.send(201, {
-    message: `User ${requestBody.fullName} saved successfuly`
+    message: `User ${requestBody.fullName}: ${requestBody.email} saved)`
   })
 })
 
+router.get('/users/:id', async (context, next) => {
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
+  await validator.validateID(User, context.params.id, context)
+
+  const foundUser = await User.findById(context.params.id, '')
+
+  context.ok({ user: foundUser })
+})
+
+router.put('/users/:id', async (context, next) => {
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
+  await validator.validateID(User, context.params.id, context)
+
+  await validator.validate(ajv, User, context.request.body, context)
+
+  const foundUser = await User.findById(context.params.id, '')
+  let requestBody = context.request.body
+
+  if (requestBody.email !== foundUser.mail) {
+    await validator.validateEmail(User, requestBody.email, context)
+  }
+
+  foundUser.fullName = requestBody.fullName
+  foundUser.description = requestBody.description
+  foundUser.school = requestBody.school
+  foundUser.class = requestBody.class
+  foundUser.phoneNumber = requestBody.phoneNumber
+  foundUser.role = requestBody.role // admin may change any user role
+
+  await foundUser.save()
+
+  context.ok({ message: `User ${requestBody.fullName}: ${requestBody.email} updated` })
+})
 router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
