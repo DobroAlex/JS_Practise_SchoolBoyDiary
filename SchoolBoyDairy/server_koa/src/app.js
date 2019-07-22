@@ -153,15 +153,21 @@ router.put('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
 
-  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class mail'))[0]
+  const foundUser = (await User.find({ mail: decoded.email }, 'fullName description school class mail phoneNumber'))[0]
   let requestBody = context.request.body
+
+  if (foundUser.mail !== requestBody.email) { // if user want's to edit his email the new one should be free
+    await validator.ValidateFreeEmail(User, requestBody.email, context)
+  }
+
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
   foundUser.mail = requestBody.email
   foundUser.phoneNumber = requestBody.phoneNumber
-  foundUser.save()
+
+  await foundUser.save()
   context.ok({
     message: `User ${foundUser.fullName} : ${foundUser.mail} updated`
   })
