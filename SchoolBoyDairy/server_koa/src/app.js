@@ -19,7 +19,10 @@ const utils = require('./utils')
 const validator = require('./validator')
 const mongoconnection = require('./mongoconnection')
 const jwtUtils = require('./jwt-utils')
-const User = require('../models/user')
+
+const models = require('../models/user')
+const User = models.User
+const TokenBlackList = models.TokenBlackList
 
 app.use(logger('dev'))
 app.use(bodyParser())
@@ -32,12 +35,21 @@ console.log(`Server is listening to ${server.address().port} `)
 
 let db
 try {
-  db = mongoconnection.connectToMongo(mongoconnection.MONGO_ADDRESS)
+  db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS)
   console.log(`Connected to Mongo`)
 } catch (e) {
-  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_ADDRESS}: \n ${e}`)
+  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_USERS_ADDRESS}: \n ${e}`)
   server.close()
 }
+
+/* let tblDB
+try {
+  db = mongoconnection.connectToMongo(mongoconnection.MONGO_TBL_ADDRESS)
+  console.log(`Connected to Mongo`)
+} catch (e) {
+  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_TBL_ADDRESS}: \n ${e}`)
+  server.close()
+} */
 
 app.use(async function handleError (context, next) {
   try {
@@ -107,6 +119,8 @@ router.post('/public/login', async (context, next) => {
 })
 
 router.get('/users', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
@@ -115,6 +129,8 @@ router.get('/users', async (context, next) => {
 })
 
 router.post('/users', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
@@ -137,6 +153,8 @@ router.post('/users', async (context, next) => {
 })
 
 router.get('/users/:id', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validateID(User, context.params.id, context)
@@ -147,6 +165,8 @@ router.get('/users/:id', async (context, next) => {
 })
 
 router.put('/users/:id', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validateID(User, context.params.id, context)
@@ -176,6 +196,8 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.get('/me', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
@@ -186,6 +208,8 @@ router.get('/me', async (context, next) => {
 })
 
 router.put('/me', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating token
 
@@ -205,7 +229,10 @@ router.put('/me', async (context, next) => {
   foundUser.email = requestBody.email
   foundUser.phoneNumber = requestBody.phoneNumber
 
+  await jwtUtils.invalidateToken(context)
+
   await foundUser.save()
+
   context.ok({
     message: `User ${foundUser.fullName} : ${foundUser.email} updated`,
     token: jwtUtils.newAccessToken({ email: requestBody.email, role: 'user' })
@@ -213,6 +240,8 @@ router.put('/me', async (context, next) => {
 })
 
 router.delete('/users/:id', async (context, next) => { // admin wants to delete user
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   const decoded = await jwtUtils.validateAdminRoleAndToken(context, ajv)
   await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
 
@@ -229,6 +258,8 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 })
 
 router.delete('/me', async (context, next) => { // user wants to delete self
+  await jwtUtils.validateToken(TokenBlackList, context)
+
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validateEmail(User, decoded.email, context)
@@ -238,6 +269,9 @@ router.delete('/me', async (context, next) => { // user wants to delete self
   const userMail = foundUser.email
 
   await User.findByIdAndDelete(foundUser._id)
+
+  await jwtUtils.invalidateToken( context)
+
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`
   })

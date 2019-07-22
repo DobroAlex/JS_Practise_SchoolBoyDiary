@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const ajvSchems = require('./ajv-schems')
 const validator = require('./validator')
+const TokenBlackList = require('../models/user').TokenBlackList // TODO: fix this horrible OOP
 
 module.exports = {
   newAccessToken: function ({ email, role }) {
@@ -17,6 +18,23 @@ module.exports = {
       throw new Error('Requset dosen\'t contains token')
     }
     return context.request.header.authorization.split('Bearer')[1].trim()
+  },
+
+  invalidateToken: async function (context, Model = TokenBlackList) {
+    const targetToken = this.getTokenFromHeader(context)
+    const newToken = new Model({
+      token: targetToken
+    })
+    await Model.save(newToken)
+  },
+
+  validateToken: async function (Model, context) {
+    const token = this.getTokenFromHeader(context)
+    const count = await Model.find({ token: token })
+    if (count.length > 0) {
+      context.status = 404
+      throw new Error(`Invalid token ${token}`)
+    }
   },
 
   isValidAdminRole: function (token) {

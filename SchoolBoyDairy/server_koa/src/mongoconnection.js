@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 module.exports = {
-  MONGO_ADDRESS: 'mongodb://localhost:27017/users',
+  MONGO_USERS_ADDRESS: 'mongodb://localhost:27017/users',
+
   connectToMongo: function (address) {
     mongoose.connect(address, { useNewUrlParser: true }).then(
       () => { const db = mongoose.connection; return db }, // on success
