@@ -68,7 +68,7 @@ router.post('/public/register', async (context, next) => {
 
   const requestBody = context.request.body
 
-  await validator.IsFreeEmail(User, requestBody.email, context)
+  await validator.ValidateFreeEmail(User, requestBody.email, context)
   let newUser = new User({
     fullName: requestBody.fullName,
     description: requestBody.description,
