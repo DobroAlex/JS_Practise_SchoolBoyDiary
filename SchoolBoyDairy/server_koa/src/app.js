@@ -173,7 +173,7 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 
   await validator.validateID(User, context.params.id)
 
-  const foundUser = (await User.findById(context.params.id))
+  const foundUser = await User.findById(context.params.id)
   const userName = foundUser.fullName
   const userMail = foundUser.mail
 
