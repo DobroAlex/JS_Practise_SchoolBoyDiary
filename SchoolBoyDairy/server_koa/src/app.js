@@ -81,9 +81,8 @@ router.post('/public/register', async (context, next) => {
                  via MongoDB Compass */
   })
   await newUser.save()
-  context.send(201, {
-    message: `User ${requestBody.fullName} (${requestBody.email} saved)`
-  })
+
+  context.ok({ message: `User ${requestBody.fullName}: ${requestBody.email} saved` })
 })
 
 router.post('/public/login', async (context, next) => {
