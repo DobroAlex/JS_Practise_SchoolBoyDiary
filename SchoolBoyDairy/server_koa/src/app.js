@@ -114,7 +114,7 @@ router.get('/users', async (context, next) => {
   context.ok({ users: foundUsers })
 })
 
-router.post('admin/users', async (context, next) => {
+router.post('/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
