@@ -169,14 +169,18 @@ router.put('/users/:id', async (context, next) => {
 
   await foundUser.save()
 
-  context.ok({ message: `User ${requestBody.fullName}: ${requestBody.email} updated` })
+  context.ok(
+    { message: `User ${requestBody.fullName}: ${requestBody.email} updated`,
+      token: jwtUtils.newAccessToken({ email: requestBody.email, role: requestBody.role })
+    })
 })
+
 router.get('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
 
-  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber role'))[0]
+  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
 
   context.ok(foundUser)
 })
@@ -203,7 +207,8 @@ router.put('/me', async (context, next) => {
 
   await foundUser.save()
   context.ok({
-    message: `User ${foundUser.fullName} : ${foundUser.email} updated`
+    message: `User ${foundUser.fullName} : ${foundUser.email} updated`,
+    token: jwtUtils.newAccessToken({ email: requestBody.email, role: 'user' })
   })
 })
 
