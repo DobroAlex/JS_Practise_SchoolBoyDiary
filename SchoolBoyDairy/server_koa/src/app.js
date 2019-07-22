@@ -185,7 +185,7 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 
 router.delete('/me', async (context, next) => { // user wants to delete self
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  
+
   await validator.validateEmail(User, decoded.email, context)
 
   const foundUser = (await User.find({ mail: decoded.email }))[0]
