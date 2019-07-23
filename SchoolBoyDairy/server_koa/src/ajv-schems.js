@@ -1,7 +1,22 @@
 module.exports = Object.freeze({ // TODO I liked this Object.freeze!
   class_of_school_regex: new RegExp('^\\d-[а-я]{1}|university$'), // doesn't work at the moment
-  POST_USERS_SCHEMA: {
-    id: 'POST_USERS_SCHEMA',
+  GET_ME_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
+    id: 'GET_ME_SCHEMA',
+    type: 'object',
+    properties: {
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      role: {
+        type: 'string',
+        minLength: 1
+      }
+    },
+    required: ['email', 'role']
+  },
+  PUT_ME_SCHEMA: {
+    id: 'PUT_ME_SCHEMA',
     type: 'object',
     properties: {
       fullName: {
@@ -19,12 +34,20 @@ module.exports = Object.freeze({ // TODO I liked this Object.freeze!
       class: {
         type: 'string',
         pattern: '^\\d-[а-я]{1}|university$'
+      },
+      phoneNumber: {
+        type: 'string',
+        pattern: '^\\+\\d{11}$'
+      },
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
       }
     },
-    required: ['fullName', 'description', 'school', 'class']
+    required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber']
   },
-  GET_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
-    id: 'GET_USERS_ID_SCHEMA',
+  DELETE_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
+    id: 'DELETE_USERS_ID_SCHEMA',
     type: 'object',
     properties: {
       id: {
@@ -34,49 +57,15 @@ module.exports = Object.freeze({ // TODO I liked this Object.freeze!
     },
     required: ['id']
   },
-  PUT_USERS_ID_SCHEMA: {
-    id: 'PUT_USERS_ID_SCHEMA',
-    type: 'object',
-    properties: {
-      _id: {
-        type: 'string',
-        pattern: '^[0-9a-fA-F]{24}$'
-      },
-      fullName: {
-        type: 'string',
-        minLength: 1
-      },
-      description: {
-        type: 'string',
-        minLength: 1
-      },
-      school: {
-        type: 'string',
-        minLength: 1
-      },
-      class: {
-        type: 'string',
-        pattern: '^\\d-[а-я]{1}|university$'
-      }
-    },
-    required: ['_id', 'fullName', 'description', 'school', 'class']
-  },
-  DELETE_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
-    id: 'DELETE_USERS_ID_SCHEMA',
-    type: 'object',
-    properties: {
-      _id: {
-        type: 'string',
-        pattern: '^[0-9a-fA-F]{24}$' // checking if :id is even valid
-      }
-    },
-    required: ['_id']
-  },
   REGISTER_USER_SCHEMA: {
     id: 'REGISTER_USER_SCHEMA',
     type: 'object',
     properties: {
       fullName: {
+        type: 'string',
+        minLength: 1
+      },
+      description: {
         type: 'string',
         minLength: 1
       },
@@ -95,8 +84,41 @@ module.exports = Object.freeze({ // TODO I liked this Object.freeze!
       email: {
         type: 'string',
         pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      phoneNumber: {
+        type: 'string',
+        pattern: '^\\+\\d{11}$'
       }
     },
-    required: ['fullName', 'school', 'class', 'password', 'email']
+    required: ['fullName', 'description', 'school', 'class', 'password', 'email', 'phoneNumber']
+  },
+  LOGIN_USER_SCHEMA: {
+    id: 'LOGIN_USER_SCHEMA',
+    properties: {
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      password: {
+        type: 'string',
+        pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$'
+      }
+    },
+    required: ['email', 'password']
+  },
+  POST_USER_SCHEMA: this.PUT_ME_SCHEMA, // avoding duplication
+  JWT_TOKEN_SCHEMA: {
+    id: 'JWT_TOKEN_SCHEMA',
+    properties: {
+      email: {
+        type: 'string',
+        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+      },
+      role: {
+        type: 'string',
+        minLength: 1
+      }
+    },
+    required: ['email', 'role']
   }
 })

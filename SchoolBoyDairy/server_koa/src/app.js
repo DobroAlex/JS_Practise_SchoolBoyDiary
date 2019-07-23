@@ -1,49 +1,69 @@
 // TODO Use extra empty line to emphasize 'require' logic blocs
 // and rearrange 'require' blocks and function calls
 const koa = require('koa')
+const app = new koa()
+
 const bodyParser = require('koa-bodyparser')
-// const cors = require('cors');
 const logger = require('koa-morgan')
-const mongoose = require('mongoose')
+
 const koaRouter = require('koa-router')
+const router = new koaRouter()
+
 const koaRespond = require('koa-respond')
 const jwt = require('koa-jwt')
 const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+
+const Ajv = require('ajv')
+const ajv = new Ajv({ allErrors: true })
+
 const utils = require('./utils')
 const validator = require('./validator')
-const app = new koa()
-const router = new koaRouter()
-const User = require('../models/user')
+const mongoconnection = require('./mongoconnection')
+const jwtUtils = require('./jwt-utils')
+
+const models = require('../models/user')
+const User = models.User
+const TokenBlackList = models.TokenBlackList
+
 app.use(logger('dev'))
 app.use(bodyParser())
 app.use(koaRespond())
-const Ajv = require('ajv')
-const ajv = new Ajv({ allErrors: true })
+
 const ajvSchems = require('./ajv-schems')
 // app.use(cors());
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
-// TODO better move mongo connection to separate file
-const mongoAddress = 'mongodb://localhost:27017/users'
 let db
-mongoose.connect(mongoAddress).then(
-  () => { db = mongoose.connection; console.log('Successfully connected to db') },
-  err => { console.log(err); console.error('Unable to connect to db, shutting down the server'); server.close() } // this shouldn't happen normally if your mongoDB is online
-)
+try {
+  db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS)
+  console.log(`Connected to Mongo`)
+} catch (e) {
+  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_USERS_ADDRESS}: \n ${e}`)
+  server.close()
+}
+
+/* let tblDB
+try {
+  db = mongoconnection.connectToMongo(mongoconnection.MONGO_TBL_ADDRESS)
+  console.log(`Connected to Mongo`)
+} catch (e) {
+  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_TBL_ADDRESS}: \n ${e}`)
+  server.close()
+} */
 
 app.use(async function handleError (context, next) {
   try {
     await next()
   } catch (error) {
-    console.error(`Error occured: \n ${error}`)
+    console.error(`Error occured: \n ${error} \n ${error.stack}`)
     context.send(context.status, `${error}`)
   }
 })
 
 app.use(jwt({
-  secret: utils.SECRET
+  secret: jwtUtils.JWT_SECRET
 }).unless({
   path: [/^\/public/, '/']
 }))
@@ -59,20 +79,47 @@ router.post('/public/register', async (context, next) => {
   // TODO you may unite two validation functions. It will look better
 
   await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
-  // TODO Use extra empty lines between logical code blocks. It is more readable
+
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
-  const requestBody = context.request.body // you may use destructuring for easier variables usage. Example below
-  await validator.IsFreeEmail(User, requestBody.email, context)
+
+  const requestBody = context.request.body
+
+  await validator.ValidateFreeEmail(User, requestBody.email, context)
   let newUser = new User({
     fullName: requestBody.fullName,
+    description: requestBody.description,
     school: requestBody.school,
-    mail: requestBody.email,
-    password: hashedPass
+    email: requestBody.email,
+    password: hashedPass,
+    class: requestBody.class,
+    phoneNumber: requestBody.phoneNumber,
+    role: 'user' /* by default, each new entity is a simple user. Real admin have to change his role to 'admin'
+                 via MongoDB Compass */
   })
   await newUser.save()
-  context.send(201, {
-    message: `User ${requestBody.fullName} (${requestBody.email} saved)`
-  })
+
+  context.ok({ message: `User ${requestBody.fullName}: ${requestBody.email} saved` })
+})
+
+router.post('/public/login', async (context, next) => {
+  await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
+
+  const foundUser = (await User.find({ email: context.request.body.email }, 'fullName password email role'))[0]
+  if (!foundUser) {
+    context.status = 404
+    throw new Error(`No user ${context.request.body.email} has been found`)
+  }
+
+  if (await bcrypt.compare(context.request.body.password, foundUser.password)) {
+    context.send(200, {
+      token: jwtUtils.newAccessToken({
+        email: context.request.body.email,
+        role: foundUser.role }) }
+    )
+  } else {
+    context.status = 403
+    throw new Error('Incorrect password')
+  }
 })
 
 // I did not test it. May contain bugs
@@ -99,55 +146,161 @@ router.post('/public/register', async (context, next) => {
 // })
 
 router.get('/users', async (context, next) => {
-  const foundUsers = await User.find({}, 'fullName description school class').sort({ _id: -1 })
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
+  const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
+
   context.ok({ users: foundUsers })
 })
 
 router.post('/users', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.POST_USERS_SCHEMA, context.request.body, context)
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
+  await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
+
   let requestBody = context.request.body
   let newUser = new User({
     fullName: requestBody.fullName,
     description: requestBody.description,
     school: requestBody.school,
-    class: requestBody.class
+    class: requestBody.class,
+    email: requestBody.email,
+    role: requestBody.role, // admins may create other admins
+    phoneNumber: requestBody.phoneNumber
   })
+
   await newUser.save()
   context.send(201, {
-    message: `User ${requestBody.fullName} saved successfuly`
+    message: `User ${requestBody.fullName}: ${requestBody.email} saved)`
   })
 })
 
 router.get('/users/:id', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.GET_USERS_ID_SCHEMA, context.params, context, 404)
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
   await validator.validateID(User, context.params.id, context)
-  const foundUser = await User.findById(context.params.id, 'fullName description')
-  context.ok(foundUser)
+
+  const foundUser = await User.findById(context.params.id, '')
+
+  context.ok({ user: foundUser })
 })
 
 router.put('/users/:id', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.PUT_USERS_ID_SCHEMA, context.request.body, 400)
-  await validator.validateID(User, context.request.body._id, context)
-  const foundUser = await User.findById(context.request.body._id, 'fullName description school class')
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
+  await validator.validateID(User, context.params.id, context)
+
+  await validator.validate(ajv, User, context.request.body, context)
+
+  const foundUser = await User.findById(context.params.id, '')
   let requestBody = context.request.body
+
+  if (requestBody.email !== foundUser.email) {
+    await validator.validateEmail(User, requestBody.email, context)
+  }
+
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
-  foundUser.save()
+  foundUser.phoneNumber = requestBody.phoneNumber
+  foundUser.role = requestBody.role // admin may change any user role
+
+  await foundUser.save()
+
+  context.ok(
+    { message: `User ${requestBody.fullName}: ${requestBody.email} updated`,
+      token: jwtUtils.newAccessToken({ email: requestBody.email, role: requestBody.role })
+    })
+})
+
+router.get('/me', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
+
+  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
+
+  context.ok(foundUser)
+})
+
+router.put('/me', async (context, next) => {
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating token
+
+  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
+
+  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
+  let requestBody = context.request.body
+
+  if (foundUser.email !== requestBody.email) { // if user want's to edit his email the new one should be free
+    await validator.ValidateFreeEmail(User, requestBody.email, context)
+  }
+
+  foundUser.fullName = requestBody.fullName
+  foundUser.description = requestBody.description
+  foundUser.school = requestBody.school
+  foundUser.class = requestBody.class
+  foundUser.email = requestBody.email
+  foundUser.phoneNumber = requestBody.phoneNumber
+
+  await jwtUtils.invalidateToken(context)
+
+  await foundUser.save()
+
   context.ok({
-    message: `User ${foundUser.fullName} updated`
+    message: `User ${foundUser.fullName} : ${foundUser.email} updated`,
+    token: jwtUtils.newAccessToken({ email: requestBody.email, role: 'user' })
   })
 })
 
-router.delete('/users/:id', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)
+router.delete('/users/:id', async (context, next) => { // admin wants to delete user
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  const decoded = await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
+
   await validator.validateID(User, context.params.id)
-  let foundUser = await User.findById(context.params.id)
-  let userName = foundUser.fullName
+
+  const foundUser = await User.findById(context.params.id)
+  const userName = foundUser.fullName
+  const userMail = foundUser.email
+
   await User.findByIdAndDelete(context.params.id)
   context.send(201, {
-    message: `User ${userName} deleted`
+    message: `User ${userName}: ${userMail} deleted`
+  })
+})
+
+router.delete('/me', async (context, next) => { // user wants to delete self
+  await jwtUtils.validateToken(TokenBlackList, context)
+
+  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
+
+  await validator.validateEmail(User, decoded.email, context)
+
+  const foundUser = (await User.find({ email: decoded.email }))[0]
+  const userName = foundUser.fullName
+  const userMail = foundUser.email
+
+  await User.findByIdAndDelete(foundUser._id)
+
+  await jwtUtils.invalidateToken( context)
+
+  context.send(201, {
+    message: `User ${userName}: ${userMail} deleted`
   })
 })
 
