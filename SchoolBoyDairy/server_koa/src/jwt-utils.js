@@ -19,15 +19,6 @@ module.exports = {
     return context.request.header.authorization.split('Bearer')[1].trim()
   },
 
-  validateToken: async function (Model, context) {
-    const token = this.getTokenFromHeader(context)
-    const count = await Model.find({ token: token })
-    if (count.length > 0) {
-      context.status = 404
-      throw new Error(`Invalid token ${token}`)
-    }
-  },
-
   isValidAdminRole: function (token) {
     const decoded = this.verifyAccessToken(token)
     return (decoded && (decoded.role === 'admin'))
