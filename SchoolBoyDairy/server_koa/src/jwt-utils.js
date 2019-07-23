@@ -43,7 +43,7 @@ module.exports = {
     return decoded
   },
 
-  defaultExpireTime: '30m',
+  defaultExpireTime: '5m',
 
   JWT_SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
   'b81a108d011c9e241bcc9627ad08355defaef1660f2bed51fbb810bed0cd759eb519b83fe633a50e' +
