@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const ajvSchems = require('./ajv-schems')
 const validator = require('./validator')
+const utils = require('./utils')
 
 module.exports = {
   newAccessToken: function ({ email, role }) {
@@ -8,21 +9,13 @@ module.exports = {
   },
 
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
-    try {
-      return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
-    } catch (e) {
-      throw e
+    const result = jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+    if (!result) {
+      throw utils.errorGenerator(`Token ${token} expired or incorrect`, 401)
     }
+    return result
   },
 
-  validateTokenWrapper: async function (context) {
-    const res = await this.verifyAccessToken(this.getTokenFromHeader(context))
-    if (!res) {
-      context.status = 401
-      throw new Error(`Token ${this.getTokenFromHeader(context)} expired`)
-    }
-    return res
-  },
   getTokenFromHeader: function (context) {
     if (!context.request.header.authorization || !context.request.header.authorization.includes('Bearer')) {
       context.status = 400

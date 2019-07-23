@@ -173,7 +173,6 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.get('/me', async (context, next) => {
-  await jwtUtils.validateTokenWrapper(context)
 
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
