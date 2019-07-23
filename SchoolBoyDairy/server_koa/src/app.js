@@ -65,7 +65,7 @@ router.post('/public/register', async (context, next) => {
 
   const requestBody = context.request.body
 
-  await validator.ValidateFreeEmail(User, requestBody.email, context)
+  await validator.ValidateFreeEmail(User, requestBody.email)
   let newUser = new User({
     fullName: requestBody.fullName,
     description: requestBody.description,
@@ -154,7 +154,7 @@ router.put('/users/:id', async (context, next) => {
   let requestBody = context.request.body
 
   if (requestBody.email !== foundUser.email) {
-    await validator.validateEmail(User, requestBody.email, context)
+    await validator.validateEmail(User, requestBody.email)
   }
 
   foundUser.fullName = requestBody.fullName
@@ -194,7 +194,7 @@ router.put('/me', async (context, next) => {
   let requestBody = context.request.body
 
   if (foundUser.email !== requestBody.email) { // if user want's to edit his email the new one should be free
-    await validator.ValidateFreeEmail(User, requestBody.email, context)
+    await validator.ValidateFreeEmail(User, requestBody.email)
   }
 
   foundUser.fullName = requestBody.fullName
@@ -231,7 +231,7 @@ router.delete('/users/:id', async (context, next) => { // admin wants to delete 
 router.delete('/me', async (context, next) => { // user wants to delete self
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
-  await validator.validateEmail(User, decoded.email, context)
+  await validator.validateEmail(User, decoded.email)
 
   const foundUser = (await User.find({ email: decoded.email }))[0]
   const userName = foundUser.fullName

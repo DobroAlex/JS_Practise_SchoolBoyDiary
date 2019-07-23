@@ -24,23 +24,21 @@ module.exports = {
     }
   },
 
-  ValidateFreeEmail: async function (Model, email, context) {
+  ValidateFreeEmail: async function (Model, email) {
     const count = await Model.countDocuments({ email: email })
     if (!count) {
       return true
     } else {
-      context.status = 422
-      throw new Error(`E-mail ${email} has already been taken`)
+      throw utils.errorGenerator(`E-mail ${email} has already been taken`, 422) // https://stackoverflow.com/questions/6123425/rest-response-code-for-invalid-data
     }
   },
 
-  validateEmail: async function (Model, email, context) {
+  validateEmail: async function (Model, email) {
     const count = await Model.countDocuments({ email: email })
     if (count) {
       return true
     } else {
-      context.status = 404
-      throw new Error(`No user with ${email} has been found, probably deleted or wasn't created`)
+      throw utils.errorGenerator(`No user with ${email} has been found, probably deleted or wasn't created`, 404)
     }
   }
 }
