@@ -41,14 +41,6 @@ try {
   server.close()
 }
 
-/* let tblDB
-try {
-  db = mongoconnection.connectToMongo(mongoconnection.MONGO_TBL_ADDRESS)
-  console.log(`Connected to Mongo`)
-} catch (e) {
-  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_TBL_ADDRESS}: \n ${e}`)
-  server.close()
-} */
 
 app.use(async function handleError (context, next) {
   try {
