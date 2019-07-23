@@ -82,7 +82,7 @@ router.post('/public/register', async (context, next) => {
 router.post('/public/login', async (context, next) => {
   await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
 
-  const foundUser = (await User.find({ email: context.request.body.email }, 'fullName password email role'))[0]
+  const foundUser = await User.findOne({ email: context.request.body.email }, 'fullName password email role')
   if (!foundUser) {
     context.status = 404
     throw new Error(`No user ${context.request.body.email} has been found`)
@@ -103,7 +103,7 @@ router.post('/public/login', async (context, next) => {
 router.get('/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
-  const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
+  const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
 
   context.ok({ users: foundUsers })
 })
@@ -174,7 +174,7 @@ router.get('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
 
-  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
+  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
 
   context.ok(foundUser)
 })
@@ -185,7 +185,7 @@ router.put('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
 
-  const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
+  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
   let requestBody = context.request.body
 
   if (foundUser.email !== requestBody.email) { // if user want's to edit his email the new one should be free
