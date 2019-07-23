@@ -12,17 +12,5 @@ const UserSchmea = new Schema({
   role: String // either user or admin
 })
 
-const BlackListSchema = new Schema({
-  token: String
-},
-{
-  timestamps: {
-    createdAt: 'created_at' } }
-)
-BlackListSchema.methods.add = async function (token) {
-  await TokenBlackList.save({ token: token })
-}
-
-const TokenBlackList = mongoose.model('BlackList', BlackListSchema)
 const User = mongoose.model('User', UserSchmea)
-module.exports = { User, TokenBlackList }
+module.exports = User
