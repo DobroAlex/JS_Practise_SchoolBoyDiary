@@ -31,14 +31,7 @@ const ajvSchems = require('./ajv-schems')
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
-let db
-try {
-  db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS)
-  console.log(`Connected to Mongo`)
-} catch (e) {
-  console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_USERS_ADDRESS}: \n ${e}`)
-  server.close()
-}
+const db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS, server)
 
 app.use(async function handleError (context, next) {
   try {
