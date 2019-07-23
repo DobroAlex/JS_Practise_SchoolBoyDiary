@@ -36,6 +36,7 @@ const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
 let db
+// TODO You moved connection to file so you may move catch block there too
 try {
   db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS)
   console.log(`Connected to Mongo`)
@@ -104,6 +105,7 @@ router.post('/public/register', async (context, next) => {
 router.post('/public/login', async (context, next) => {
   await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
 
+  // TODO User.findOne
   const foundUser = (await User.find({ email: context.request.body.email }, 'fullName password email role'))[0]
   if (!foundUser) {
     context.status = 404
@@ -150,6 +152,7 @@ router.get('/users', async (context, next) => {
 
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
+  // TODO maybe better sort by some human readable field
   const foundUsers = await User.find({}).sort({ _id: -1 }) // Get all of them
 
   context.ok({ users: foundUsers })
@@ -229,6 +232,7 @@ router.get('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
 
+  // TODO User.findOne
   const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
 
   context.ok(foundUser)
@@ -242,6 +246,7 @@ router.put('/me', async (context, next) => {
 
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
 
+  // TODO User.findOne
   const foundUser = (await User.find({ email: decoded.email }, 'fullName description school class email phoneNumber'))[0]
   let requestBody = context.request.body
 
