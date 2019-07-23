@@ -20,8 +20,7 @@ const validator = require('./validator')
 const mongoconnection = require('./mongoconnection')
 const jwtUtils = require('./jwt-utils')
 
-const models = require('../models/user')
-const User = models.User
+const User = require('../models/user')
 
 app.use(logger('dev'))
 app.use(bodyParser())
@@ -40,7 +39,6 @@ try {
   console.error(`Couldn't connect to Mongo  at ${mongoconnection.MONGO_USERS_ADDRESS}: \n ${e}`)
   server.close()
 }
-
 
 app.use(async function handleError (context, next) {
   try {
