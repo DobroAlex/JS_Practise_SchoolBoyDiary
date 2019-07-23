@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 module.exports = {
-  MONGO_USERS_ADDRESS: 'mongodb://localhost:27016/users',
+  MONGO_USERS_ADDRESS: 'mongodb://localhost:27017/users',
 
   connectToMongo: async function (address, server) {  //TODO: bad OOP
     try {
