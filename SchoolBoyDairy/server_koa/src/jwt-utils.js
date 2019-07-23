@@ -18,8 +18,7 @@ module.exports = {
 
   getTokenFromHeader: function (context) {
     if (!context.request.header.authorization || !context.request.header.authorization.includes('Bearer')) {
-      context.status = 400
-      throw new Error('Requset dosen\'t contains token')
+      throw utils.errorGenerator('Requset dosen\'t contains token', 400)
     }
     return context.request.header.authorization.split('Bearer')[1].trim()
   },
@@ -33,13 +32,12 @@ module.exports = {
     const decoded = this.verifyAccessToken(this.getTokenFromHeader(context))
 
     if (!await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 403) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
-      context.status = 403
-      throw new Error(`Attempt to reach admin page while not being one for ${this.verifyAccessToken(this.getTokenFromHeader(context)).email}`)
+      throw utils.errorGenerator(`Attempt to reach admin page while not being one for ${this.verifyAccessToken(this.getTokenFromHeader(context)).email}`, 403)
     }
     return decoded
   },
 
-  defaultExpireTime: '5m',
+  defaultExpireTime: '5m', // I want to keep it rational
 
   JWT_SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
   'b81a108d011c9e241bcc9627ad08355defaef1660f2bed51fbb810bed0cd759eb519b83fe633a50e' +

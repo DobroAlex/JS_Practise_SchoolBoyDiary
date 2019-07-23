@@ -87,8 +87,7 @@ router.post('/public/login', async (context, next) => {
 
   const foundUser = await User.findOne({ email: context.request.body.email }, 'fullName password email role')
   if (!foundUser) {
-    context.status = 404
-    throw new Error(`No user ${context.request.body.email} has been found`)
+    throw utils.errorGenerator(`No user ${context.request.body.email} has been found`, 404)
   }
 
   if (await bcrypt.compare(context.request.body.password, foundUser.password)) {
@@ -98,8 +97,7 @@ router.post('/public/login', async (context, next) => {
         role: foundUser.role }) }
     )
   } else {
-    context.status = 403
-    throw new Error('Incorrect password')
+    throw utils.errorGenerator('Incorrect passwrod', 403)
   }
 })
 
@@ -212,7 +210,8 @@ router.put('/me', async (context, next) => {
 })
 
 router.delete('/users/:id', async (context, next) => { // admin wants to delete user
-  const decoded = await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+
   await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
 
   await validator.validateID(User, context.params.id)
