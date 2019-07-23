@@ -9,11 +9,15 @@ module.exports = {
   },
 
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
-    const result = jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
-    if (!result) {
-      throw utils.errorGenerator(`Token ${token} expired or incorrect`, 401)
+    try {
+      return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+    } catch (e) {
+      if (e.name === 'TokenExpiredError') {
+        throw utils.errorGenerator('Token expired', 401)
+      } else {
+        throw utils.errorGenerator('Incorrect token', 400)
+      }
     }
-    return result
   },
 
   getTokenFromHeader: function (context) {

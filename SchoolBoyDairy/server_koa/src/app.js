@@ -45,11 +45,12 @@ app.use(async function handleError (context, next) {
   }
 })
 
-app.use(jwt({
+/* app.use(jwt({
   secret: jwtUtils.JWT_SECRET
 }).unless({
   path: [/^\/public/, '/']
 }))
+*/
 
 app.use(async (ctx, next) => {
   const start = Date.now()
@@ -171,7 +172,6 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.get('/me', async (context, next) => {
-
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
