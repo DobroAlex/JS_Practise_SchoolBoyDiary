@@ -8,9 +8,21 @@ module.exports = {
   },
 
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
-    return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+    try {
+      return jwt.verify(token, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+    } catch (e) {
+      throw e
+    }
   },
 
+  validateTokenWrapper: async function (context) {
+    const res = await this.verifyAccessToken(this.getTokenFromHeader(context))
+    if (!res) {
+      context.status = 401
+      throw new Error(`Token ${this.getTokenFromHeader(context)} expired`)
+    }
+    return res
+  },
   getTokenFromHeader: function (context) {
     if (!context.request.header.authorization || !context.request.header.authorization.includes('Bearer')) {
       context.status = 400

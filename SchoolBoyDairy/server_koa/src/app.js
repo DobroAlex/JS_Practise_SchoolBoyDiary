@@ -38,6 +38,9 @@ app.use(async function handleError (context, next) {
     await next()
   } catch (error) {
     console.error(`Error occured: \n ${error} \n ${error.stack}`)
+    if (error.status) {
+      context.status = error.status
+    }
     context.send(context.status, `${error}`)
   }
 })
@@ -56,7 +59,7 @@ app.use(async (ctx, next) => {
 })
 
 router.post('/public/register', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body, context)
+  await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body)
 
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
 
@@ -80,7 +83,7 @@ router.post('/public/register', async (context, next) => {
 })
 
 router.post('/public/login', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body, context)
+  await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body)
 
   const foundUser = await User.findOne({ email: context.request.body.email }, 'fullName password email role')
   if (!foundUser) {
@@ -111,7 +114,7 @@ router.get('/users', async (context, next) => {
 router.post('/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
-  await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body, context)
+  await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body)
 
   let requestBody = context.request.body
   let newUser = new User({
@@ -145,7 +148,7 @@ router.put('/users/:id', async (context, next) => {
 
   await validator.validateID(User, context.params.id, context)
 
-  await validator.validate(ajv, User, context.request.body, context)
+  await validator.validate(ajv, User, context.request.body)
 
   const foundUser = await User.findById(context.params.id, '')
   let requestBody = context.request.body
@@ -170,9 +173,11 @@ router.put('/users/:id', async (context, next) => {
 })
 
 router.get('/me', async (context, next) => {
+  await jwtUtils.validateTokenWrapper(context)
+
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
-  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 404)
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
 
   const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
 
@@ -181,9 +186,9 @@ router.get('/me', async (context, next) => {
 
 router.put('/me', async (context, next) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 400) // validating token
+  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) // validating token
 
-  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body, context) // validating request body
+  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body) // validating request body
 
   const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
   let requestBody = context.request.body

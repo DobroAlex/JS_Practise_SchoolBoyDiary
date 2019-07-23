@@ -1,11 +1,12 @@
+const utils = require('./utils')
+
 module.exports = {
-  validate: async function (ajvInstance, schema, data, context, statusCode = 400) {
+  validate: async function (ajvInstance, schema, data) {
     if (ajvInstance.validate(schema, data)) {
       return true
     }
 
-    context.status = statusCode
-    throw new Error(`${ajvInstance.errorsText()}`)
+    throw utils.errorGenerator(ajvInstance.errorsText(), 400)
   },
 
   validateID: async function (Model, id, context) {
