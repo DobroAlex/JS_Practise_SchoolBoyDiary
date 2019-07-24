@@ -92,14 +92,51 @@ router.post('/public/login', async (context, next) => {
   }
 
   if (await bcrypt.compare(context.request.body.password, foundUser.password)) {
+    const token = jwtUtils.newAccessToken({
+      email: context.request.body.email,
+      role: foundUser.role
+    })
+    const refreshToken = jwtUtils.newRefreshToken({
+      email: context.request.body.email,
+      role: foundUser.role
+    }, jwtUtils.defaultRefreshExpireTime)
+
+    foundUser.refreshToken = refreshToken
+    await foundUser.save()
+
     context.send(200, {
-      token: jwtUtils.newAccessToken({
-        email: context.request.body.email,
-        role: foundUser.role }) }
-    )
+      token: token,
+      refreshToken: refreshToken
+    })
   } else {
     throw utils.errorGenerator('Incorrect passwrod', 403)
   }
+})
+
+router.post('/me/refresh', async (context, next) => {
+  const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
+
+  const foundUser = await User.findOne({ email: decoded.email })
+
+  if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
+    throw utils.errorGenerator('Both token and refresh token expired, log in again', 401)
+  }
+  const token = jwtUtils.newAccessToken({
+    email: foundUser.email,
+    role: foundUser.role
+  })
+  const refreshToken = jwtUtils.newRefreshToken({
+    email: foundUser.email,
+    role: foundUser.role
+  })
+
+  foundUser.refreshToken = refreshToken
+  await foundUser.save()
+
+  context.ok({
+    token: token,
+    refreshToken: refreshToken
+  })
 })
 
 router.get('/users', async (context, next) => {
@@ -189,7 +226,7 @@ router.put('/me', async (context, next) => {
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
   foundUser.email = requestBody.email
-  // foundUser.phoneNumber = requestBody.phoneNumber
+  foundUser.phoneNumber = requestBody.phoneNumber
 
   await foundUser.save()
 
