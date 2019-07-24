@@ -20,6 +20,10 @@ module.exports = {
     }
   },
 
+  newRefreshToken: function ({ email, role }) {
+    return this.newAccessToken({ email: email, role: role }, this.defaultRefreshExpireTime)
+  },
+
   getTokenFromHeader: function (context) {
     if (!context.request.header.authorization || !context.request.header.authorization.includes('Bearer')) {
       throw utils.errorGenerator('Requset dosen\'t contains token', 400)
