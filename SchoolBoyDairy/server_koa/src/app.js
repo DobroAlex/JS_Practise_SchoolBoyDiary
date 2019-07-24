@@ -152,10 +152,6 @@ router.put('/users/:id', async (context, next) => {
   const foundUser = await User.findById(context.params.id, '')
   let requestBody = context.request.body
 
-  if (requestBody.email !== foundUser.email) {
-    await validator.validateEmail(User, requestBody.email)
-  }
-
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
@@ -165,10 +161,9 @@ router.put('/users/:id', async (context, next) => {
 
   await foundUser.save()
 
-  context.ok(
-    { message: `User ${requestBody.fullName}: ${requestBody.email} updated`,
-      token: jwtUtils.newAccessToken({ email: requestBody.email, role: requestBody.role })
-    })
+  context.ok({
+    message: `User ${requestBody.fullName}: ${requestBody.email} updated`
+  })
 })
 
 router.get('/me', async (context, next) => {
@@ -189,23 +184,17 @@ router.put('/me', async (context, next) => {
 
   const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
   let requestBody = context.request.body
-
-  if (foundUser.email !== requestBody.email) { // if user want's to edit his email the new one should be free
-    await validator.ValidateFreeEmail(User, requestBody.email)
-  }
-
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
   foundUser.email = requestBody.email
-  foundUser.phoneNumber = requestBody.phoneNumber
+  // foundUser.phoneNumber = requestBody.phoneNumber
 
   await foundUser.save()
 
   context.ok({
-    message: `User ${foundUser.fullName} : ${foundUser.email} updated`,
-    token: jwtUtils.newAccessToken({ email: requestBody.email, role: 'user' })
+    message: `User ${foundUser.fullName} : ${foundUser.email} updated`
   })
 })
 
