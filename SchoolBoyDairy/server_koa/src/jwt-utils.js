@@ -4,8 +4,8 @@ const validator = require('./validator')
 const utils = require('./utils')
 
 module.exports = {
-  newAccessToken: function ({ email, role }) {
-    return jwt.sign({ email, role }, this.JWT_SECRET, { expiresIn: this.defaultExpireTime })
+  newAccessToken: function ({ email, role }, expiration = this.defaultExpireTime) {
+    return jwt.sign({ email, role }, this.JWT_SECRET, { expiresIn: expiration })
   },
 
   verifyAccessToken: function (token) { // both this and upper officialy stolen from @SinaniG1996, many thanks
@@ -42,6 +42,8 @@ module.exports = {
   },
 
   defaultExpireTime: '5m', // I want to keep it rational
+
+  defaultRefreshExpireTime: '10m',
 
   JWT_SECRET: 'd908e5fb5a41f3e9b7a0c1b422f4414635c9b4e2c6f2ca2958fb11b91fe310a0bc4795a539260b60' + // 1024 bytes of randomness
   'b81a108d011c9e241bcc9627ad08355defaef1660f2bed51fbb810bed0cd759eb519b83fe633a50e' +
