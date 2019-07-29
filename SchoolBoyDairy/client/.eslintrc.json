@@ -19,10 +19,5 @@
         "vue"
     ],
     "rules": {
-    },
-    "eslint.validate": [
-        { "language": "javascript", "autoFix": true },
-        { "language": "vue", "autoFix": true },
-        { "language": "html", "autoFix": true }
-    ]
+    }
 }
