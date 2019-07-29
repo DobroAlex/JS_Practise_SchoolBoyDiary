@@ -27,7 +27,7 @@ app.use(bodyParser())
 app.use(koaRespond())
 
 const ajvSchems = require('./ajv-schems')
-// app.use(cors());
+
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
@@ -57,6 +57,12 @@ app.use(async (ctx, next) => {
   await next()
   const ms = Date.now() - start
   ctx.set('X-Response-Time', `${ms}ms`)
+})
+
+app.use(async function (context, next) { // https://github.com/axios/axios/issues/853#issuecomment-351554276
+  context.set('Access-Control-Allow-Origin', '*')
+  context.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  await next()
 })
 
 router.post('/public/register', async (context, next) => {
