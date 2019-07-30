@@ -1,5 +1,4 @@
 module.exports = Object.freeze({
-  class_of_school_regex: new RegExp('^\\d-[а-я]{1}|university$'), // doesn't work at the moment
   GET_ME_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
     id: 'GET_ME_SCHEMA',
     type: 'object',
@@ -33,7 +32,7 @@ module.exports = Object.freeze({
       },
       class: {
         type: 'string',
-        pattern: '^\\d-[а-я]{1}|university$'
+        pattern: '(^(\\d)|(10)|(11))-[а-я]{1}|university$'
       },
       phoneNumber: {
         type: 'string',
@@ -75,7 +74,7 @@ module.exports = Object.freeze({
       },
       class: {
         type: 'string',
-        pattern: '^\\d-[а-я]{1}|university$'
+        pattern: '(^(\\d)|(10)|(11))-[а-я]{1}|university$'
       },
       password: {
         type: 'string',
