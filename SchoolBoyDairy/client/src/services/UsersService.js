@@ -16,11 +16,20 @@ export default {
   deleteUser(id) {
     return Api().delete('users/' + id);
   },
-  login(email, password){
+  login(email, password) {
     try{
-      return  Api().post('public/login', {email: email, password: password})
+      return  Api().post('/public/login', {email: email, password: password})
     }
     catch(e){
+      throw e
+    }
+  },
+
+  register(email, password, fullName, school, _class, phoneNumber) {
+    try{
+      return Api().post('/public/register', {email: email, password: password, fullName: fullName, school: school, class: _class, phoneNumber: phoneNumber, description: ' '})
+    }
+    catch(e) {
       throw e
     }
   }
