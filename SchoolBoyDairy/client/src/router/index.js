@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import  HelloWorld from '@/components/HelloWorld'
+import Login from '@/components/Login'
+import HelloWorld from '@/components/HelloWorld'
 import Users from '@/components/Users' // this should work. If not, look at replacing / with \\
 import NewUser from '@/components/NewUser'
 import EditUser from "../components/EditUser";
@@ -10,6 +11,11 @@ Vue.use(Router);
 export default new Router({ //!!!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
   mode: 'history',
   routes: [
+    {
+      path:'/login',
+      name: 'Login',
+      component: Login
+    },
     {
       path: '/users',
       name: 'Users',
