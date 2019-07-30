@@ -3,36 +3,42 @@
         <form class="login" @submit.prevent="login">
             <h1>Sign in</h1>
             <label>E-mail</label>
-            <input required v-model="username" type="text" placeholder="somemail@ex.ru"/>
+            <input required v-model="email" type="text" placeholder="somemail@ex.ru"/>
             <label>Password</label>
             <input required v-model="password" type="password" placeholder="password"/>
             <hr>
             <button type="submit" @click="login">Log in</button>
             <p class="error" v-if="authError">{{ authError }}</p>
             </form>
+
+        <form class="goToRegistration">
+            <label>Doesn't have account?</label>
+            <label class="clickableLable" v-on:click="goToRegistration">Create one</label>
+        </form>
     </div>
 </template>
 
 <script>
-import UsersService from "../services/UsersService";
+import UsersService from "../services/UsersService"
+
 export default {
     name: 'login',
     data(){
         return {
-            username: '',
+            email: '',
             password: '',
             authError: '',
         }
     },
     methods: {
-        async login() {
+        login: async function() {
             try{
-            const response = await UsersService.login(this.username, this.password)
+                const response = await UsersService.login(this.email.toLowerCase(), this.password)
 
-            sessionStorage.setItem('token', response.token)
-            sessionStorage.setItem('refreshToken', response.refreshToken)
+                sessionStorage.setItem('token', response.token)
+                sessionStorage.setItem('refreshToken', response.refreshToken)
 
-            this.$router.push({name: 'me'})
+                this.$router.push({name: 'Me'})
             }
             catch(e){
                 if(e.response.status === 404) {
@@ -42,12 +48,24 @@ export default {
                     this.authError = 'Incorrect password'
                 }
             }
+        },
+        goToRegistration: function() {
+            this.$router.push({name: 'Registration'})
         }
     }
 }
 </script>
 
-<<style type="text/css">
-    .error{
-        color: red
+<style>
+    .error {
+        color: red;
     }
+
+    .goToRegistration {
+        padding-top: 24px
+    }
+
+    .clickableLable {
+        color: blue;
+    }
+</style>
