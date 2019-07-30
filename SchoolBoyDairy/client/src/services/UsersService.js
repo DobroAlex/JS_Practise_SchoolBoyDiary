@@ -15,5 +15,13 @@ export default {
   },
   deleteUser(id) {
     return Api().delete('users/' + id);
+  },
+  login(email, password){
+    try{
+      return  Api().post('public/login', {email: email, password: password})
+    }
+    catch(e){
+      throw e
+    }
   }
 }
