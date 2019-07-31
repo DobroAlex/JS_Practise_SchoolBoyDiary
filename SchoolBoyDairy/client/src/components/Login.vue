@@ -1,13 +1,13 @@
 <template>
     <div class="authForm">
-        <form class="login" @submit.prevent="login">
+        <form class="login" @submit.prevent="sendLogin">
             <h1>Sign in</h1>
             <label>E-mail</label>
             <input required v-model="email" type="text" placeholder="somemail@ex.ru"/>
             <label>Password</label>
             <input required v-model="password" type="password" placeholder="password"/>
             <hr>
-            <button type="submit" @click="login">Log in</button>
+            <button type="submit" v-on:click="sendLogin">Log in</button>
             <p class="error" v-if="authError">{{ authError }}</p>
             </form>
 
@@ -31,7 +31,10 @@ export default {
         }
     },
     methods: {
-        login: async function() {
+        sendLogin: async function() {
+            if(!this.email || !this.password) { // TODO: find out about better way of validating, maybe with pure HTML/CSS
+                return false
+            }
             try{
                 const response = await UsersService.login(this.email.toLowerCase(), this.password)
 
