@@ -93,8 +93,6 @@ router.post('/public/register', async (context, next) => {
 })
 
 router.post('/public/login', async (context, next) => {
-  await validator.validate(ajv, ajvSchems.LOGIN_USER_SCHEMA, context.request.body)
-
   const foundUser = await User.findOne({ email: context.request.body.email }, 'fullName password email role')
   if (!foundUser) {
     throw utils.errorGenerator(`No user ${context.request.body.email} has been found`, 404)
