@@ -1,14 +1,19 @@
 <template>
     <div class="authForm">
-        <form class="login" @submit.prevent="sendLogin">
+        <form class="login"  @submit.prevent="sendLogin" >
             <h1>Sign in</h1>
+
             <label>E-mail</label>
-            <input required v-model="email" type="text" placeholder="somemail@ex.ru"/>
+            <input  v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
+            <p class="error" v-if="!$v.email.required">Email required</p>
+            <p class="error" v-if="!$v.email.isValidEmail">invalid email</p>
+            
             <label>Password</label>
             <input required v-model="password" type="password" placeholder="password"/>
             <hr>
-            <button type="submit" v-on:click="sendLogin">Log in</button>
-            <p class="error" v-if="authError">{{ authError }}</p>
+            <button type="submit" :disabled="submitStatus==='PENDING'" v-on:click="sendLogin">Log in</button>
+            <p class="error" v-if="submitStatus==='ERROR'">No such username or password</p>
+            <p class="pendingMSG" v-if="submitStatus==='PENING'">Sending, plz wait...</p>
             </form>
 
         <form class="goToRegistration">
@@ -21,35 +26,39 @@
 <script>
 import UsersService from "../services/UsersService"
 
+import { required, minLength, between } from 'vuelidate/lib/validators'
+import {isValidEmail, isValidPassword} from '../validators/loginValidators'
+
 export default {
     name: 'login',
     data(){
         return {
             email: '',
             password: '',
-            authError: '',
+            submitStatus: null
         }
     },
+    
+    validations: {
+        email: {required, isValidEmail},
+        password: {required, isValidPassword}
+    },
+
     methods: {
         sendLogin: async function() {
-            if(!this.email || !this.password) { // TODO: find out about better way of validating, maybe with pure HTML/CSS
-                return false
+            if(this.$v.invalid) {
+                return false 
             }
             try{
+                this.submitStatus = 'PENDING'
                 const response = await UsersService.login(this.email.toLowerCase(), this.password)
-
+                this.submitStatus = 'OK'
                 sessionStorage.setItem('token', response.token)
                 sessionStorage.setItem('refreshToken', response.refreshToken)
-
                 this.$router.push({name: 'Me'})
             }
-            catch(e){
-                if(e.response.status === 404) {
-                    this.authError = 'No such username was found'
-                }
-                if(e.response.status === 403) {
-                    this.authError = 'Incorrect password'
-                }
+            catch(e) {
+                this.submitStatus = 'ERROR'
             }
         },
         goToRegistration: function() {
