@@ -5,7 +5,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
       },
       role: {
         type: 'string',
@@ -40,7 +40,7 @@ module.exports = Object.freeze({
       },
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
       }
     },
     required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber']
@@ -82,7 +82,7 @@ module.exports = Object.freeze({
       },
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
       },
       phoneNumber: {
         type: 'string',
@@ -96,7 +96,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
       },
       password: {
         type: 'string',
@@ -111,7 +111,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: '^[a-z0-9]|[a-z]|[0-9][^ ]+@[a-z]+.[a-z]+$'
+        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
       },
       role: {
         type: 'string',
