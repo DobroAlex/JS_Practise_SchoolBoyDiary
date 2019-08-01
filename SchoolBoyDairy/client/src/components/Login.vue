@@ -4,7 +4,7 @@
             <h1>Sign in</h1>
 
             <label>E-mail</label>
-            <input  v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
+            <input  required v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
             <p class="error" v-if="!$v.email.required">Email required</p>
             <p class="error" v-if="!$v.email.isValidEmail">invalid email</p>
             
@@ -46,8 +46,8 @@ export default {
 
     methods: {
         sendLogin: async function() {
-            if(this.$v.invalid) {
-                return false 
+            if(this.$v.$invalid) {
+                return false
             }
             try{
                 this.submitStatus = 'PENDING'
