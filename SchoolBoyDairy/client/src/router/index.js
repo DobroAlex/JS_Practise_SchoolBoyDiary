@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Vuelidate from 'vuelidate'
+import vueTouch from 'vue-touch'
 import Login from '@/components/Login'
 import Registration from '@/components/Registration'
 import HelloWorld from '@/components/HelloWorld'
@@ -8,6 +10,8 @@ import NewUser from '@/components/NewUser'
 import EditUser from "../components/EditUser";
 
 Vue.use(Router);
+Vue.use(Vuelidate);
+Vue.use(vueTouch)
 
 export default new Router({ //!!!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
   mode: 'history',
