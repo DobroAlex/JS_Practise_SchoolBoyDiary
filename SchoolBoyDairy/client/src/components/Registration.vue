@@ -6,7 +6,6 @@
             <label>E-mail</label>
             <input required v-model.lazy.lazy="email" type="email" placeholder="somemail@ex.ru">
             <p class="error" v-if="!$v.email.required">Emial required</p>
-            <p class="error" v-if="!$v.email.isValidEmail">Invalid email</p>
             <p class="error" v-if="submitStatus==='EMAIL_IN_USE'">{{submitStatus}}</p>
 
             <p>
@@ -38,12 +37,13 @@
 
             <p>
             <label>Phone Number</label>
-            <input required  v-model.lazy="phoneNumber" type="tel" placeholder="+12300000000">
+            <input   v-model.lazy="phoneNumber" type="tel" placeholder="+12300000000">
             </p>
 
         <button type="submit" :disabled="submitStatus==='PENDING'" @click="registerMe">Register me</button>
         <p class="OK" v-if="submitStatus==='OK'">Successes!</p>
-        <p class="error" v-if="submitStatus==='MAILFORMED'">Check forn=m once more</p>
+        <p class="error" v-if="submitStatus==='MAILFORMED'">Check form once more</p>
+        <p class="error" v-if="submitStatus==='NET_ERROR'">There is something wrong with network, refresh this page</p>
         <p class="pendingMSG" v-if="submitStatus==='PENING'">Registarting you, plz wait..</p>
         </form>
     </div>
@@ -52,7 +52,7 @@
 <script>
 import UsersService from "../services/UsersService"
 import { required, minLength, between } from 'vuelidate/lib/validators'
-import {isValidEmail, isValidPassword, isValidClass, isValidPhoneNumber} from "../validators/shraedValidators"
+import { isValidEmail, isValidPassword } from "../validators/shraedValidators"
 import { async } from 'q';
 
 export default {
@@ -66,14 +66,13 @@ export default {
             school: '',
             schoolClass: '',
             phoneNumber: '',
-            submitStatus: null
+            submitStatus: undefined
         }
     },
     validations: {
-        email: {required, isValidEmail},
+        email: {required},
         password: {required, isValidPassword},
         password: {required},
-        phoneNumber: {required, isValidPhoneNumber},
         school: {required}
     },
 
@@ -85,6 +84,13 @@ export default {
             try{
                 this.submitStatus = 'PENDING'
 
+                if(!this.schoolClass) {
+                    this.schoolClass = 'university'
+                }
+
+                if(!this.phoneNumber) {
+                    this.phoneNumber = '+79700000000'
+                }
                 const respond = await UsersService.register(this.email, this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
 
                 this.submitStatus = 'OK'
@@ -98,16 +104,11 @@ export default {
                 if (e.response.status === 400) {
                     this.submitStatus = 'MAILFORMED'
                 }
+                else {
+                    this.submitStatus = 'NET_ERROR'
+                }
             }
         },
-        fillEmptyFields: async function(){
-            if(!this.schoolClass) {
-                this.school = 'university'
-            }
-            if(!this.phoneNumber) {
-                this.phoneNumber = '+79700000000'
-            }
-        }
     }
 }
 </script>
