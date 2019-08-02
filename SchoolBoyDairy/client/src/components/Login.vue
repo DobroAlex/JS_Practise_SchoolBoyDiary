@@ -4,7 +4,7 @@
             <h1>Sign in</h1>
 
             <label>E-mail</label>
-            <input  required v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
+            <input required v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
             <p class="error" v-if="!$v.email.required">Email required</p>
             <p class="error" v-if="!$v.email.isValidEmail">invalid email</p>
             
@@ -27,7 +27,7 @@
 import UsersService from "../services/UsersService"
 
 import { required, minLength, between } from 'vuelidate/lib/validators'
-import {isValidEmail, isValidPassword} from '../validators/loginValidators'
+import {isValidEmail, isValidPassword} from '../validators/shraedValidators'
 
 export default {
     name: 'login',
