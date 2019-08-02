@@ -5,11 +5,12 @@
 
             <label>E-mail</label>
             <input required v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
-            <p class="error" v-if="!$v.email.required">Email required</p>
-            <p class="error" v-if="!$v.email.isValidEmail">invalid email</p>
+            <p class="error" v-if="!$v.email.required && email">Email required</p>
             
             <label>Password</label>
-            <input required v-model="password" type="password" placeholder="password"/>
+            <input required v-model.lazy="password" type="password" placeholder="password"/>
+            <p class="error" v-if="!$v.password.required && password">Password required</p>
+
             <hr>
             <button type="submit" :disabled="submitStatus==='PENDING'" v-on:click="sendLogin">Log in</button>
             <p class="error" v-if="submitStatus==='ERROR'">No such username or password</p>
@@ -27,7 +28,6 @@
 import UsersService from "../services/UsersService"
 
 import { required, minLength, between } from 'vuelidate/lib/validators'
-import {isValidEmail, isValidPassword} from '../validators/shraedValidators'
 
 export default {
     name: 'login',
@@ -40,8 +40,8 @@ export default {
     },
     
     validations: {
-        email: {required, isValidEmail},
-        password: {required, isValidPassword}
+        email: {required},
+        password: {required}
     },
 
     methods: {

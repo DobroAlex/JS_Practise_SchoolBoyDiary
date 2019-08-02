@@ -4,31 +4,31 @@
             <h1>New User Registartion</h1>
 
             <label>E-mail</label>
-            <input required v-model="email" type="email" placeholder="somemail@ex.ru">
-            <p class="error" v-if="!$v.email.required">Emial required</p>
+            <input required v-model.lazy="email" type="email" placeholder="somemail@ex.ru">
+            <p class="error" v-if="!$v.email.required && email">Emial required</p>
             <p class="error" v-if="submitStatus==='EMAIL_IN_USE'">{{submitStatus}}</p>
 
             <p>
             <label>Password</label>
-            <input required v-model="password" type="password" placeholder="password">
-            <p class="error" v-if="!$v.password.required">Password required</p>
-            <p class="error" v-if="!$v.password.isValidPassword">Password must have at least 1 capital & one number</p>
+            <input required v-model.lazy="password" type="password" placeholder="password">
+            <p class="error" v-if="!$v.password.required && password">Password required</p>
+            <p class="error" v-if="!$v.password.isValidPassword && password">Password must have at least 1 capital & one number</p>
             
             <p>
             <label>Password once again</label>
             <input required v-model="passwordRep" type="password" placeholder="password once again">
-            <p class="error" v-if="password !== passwordRep">passwords mismatch</p>
+            <p class="error" v-if="(password !== passwordRep) && passwordRep && password">passwords mismatch</p>
             
             
             <p>
             <label>Full Name</label>
-            <input required v-model="fullName" type="text" placeholder="Ivan Ivanov">
-            </p>
+            <input required v-model.lazy="fullName" type="text" placeholder="Ivan Ivanov">
+            <p class="error" v-if="!$v.fullName.required && fullName">Name required</p>
 
             <p>
             <label>School</label>
             <input required v-model="school" type="text" placeholder="School name">
-            <p class="error" v-if="!$v.school.required">Name of educational facility required</p>
+            <p class="error" v-if="!$v.school.required && school">Name of educational facility required</p>
 
             <p>
             <label>Class</label>
@@ -73,6 +73,7 @@ export default {
         email: {required},
         password: {required, isValidPassword},
         password: {required},
+        fullName: {required},
         school: {required}
     },
 
