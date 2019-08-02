@@ -5,7 +5,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
+        pattern: "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
       },
       role: {
         type: 'string',
@@ -40,7 +40,7 @@ module.exports = Object.freeze({
       },
       email: {
         type: 'string',
-        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
+        pattern: "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
       }
     },
     required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber']
@@ -78,11 +78,11 @@ module.exports = Object.freeze({
       },
       password: {
         type: 'string',
-        pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$' // https://stackoverflow.com/questions/14850553/javascript-regex-for-password-containing-at-least-8-characters-1-number-1-uppe
+        pattern: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$' // https://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
       },
       email: {
         type: 'string',
-        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
+        pattern: "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
       },
       phoneNumber: {
         type: 'string',
@@ -96,11 +96,11 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
+        pattern: "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
       },
       password: {
         type: 'string',
-        pattern: '^(?=.*\\d)(?=.*[a-z])[0-9a-zA-Z]{8,}$'
+        pattern: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$'
       }
     },
     required: ['email', 'password']
@@ -111,7 +111,7 @@ module.exports = Object.freeze({
     properties: {
       email: {
         type: 'string',
-        pattern: /[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/
+        pattern: "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
       },
       role: {
         type: 'string',
