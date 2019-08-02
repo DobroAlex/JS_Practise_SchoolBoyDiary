@@ -4,40 +4,40 @@
             <h1>New User Registartion</h1>
 
             <label>E-mail</label>
-            <input required v-model.lazy.lazy="email" type="email" placeholder="somemail@ex.ru">
+            <input required v-model="email" type="email" placeholder="somemail@ex.ru">
             <p class="error" v-if="!$v.email.required">Emial required</p>
             <p class="error" v-if="submitStatus==='EMAIL_IN_USE'">{{submitStatus}}</p>
 
             <p>
             <label>Password</label>
-            <input required v-model.lazy="password" type="password" placeholder="password">
+            <input required v-model="password" type="password" placeholder="password">
             <p class="error" v-if="!$v.password.required">Password required</p>
             <p class="error" v-if="!$v.password.isValidPassword">Password must have at least 1 capital & one number</p>
             
             <p>
             <label>Password once again</label>
-            <input required v-model.lazy="passwordRep" type="password" placeholder="password once again">
+            <input required v-model="passwordRep" type="password" placeholder="password once again">
             <p class="error" v-if="password !== passwordRep">passwords mismatch</p>
             
             
             <p>
             <label>Full Name</label>
-            <input required v-model.lazy="fullName" type="text" placeholder="Ivan Ivanov">
+            <input required v-model="fullName" type="text" placeholder="Ivan Ivanov">
             </p>
 
             <p>
             <label>School</label>
-            <input required v-model.lazy="school" type="text" placeholder="School name">
+            <input required v-model="school" type="text" placeholder="School name">
             <p class="error" v-if="!$v.school.required">Name of educational facility required</p>
 
             <p>
             <label>Class</label>
-            <input  v-model.lazy="schoolClass" type="text" placeholder="'Number-letter' or empty if university">
+            <input  v-model="schoolClass" type="text" placeholder="'Number-letter' or empty if university">
             </p>
 
             <p>
             <label>Phone Number</label>
-            <input   v-model.lazy="phoneNumber" type="tel" placeholder="+12300000000">
+            <input   v-model="phoneNumber" type="tel" placeholder="+12300000000">
             </p>
 
         <button type="submit" :disabled="submitStatus==='PENDING'" @click="registerMe">Register me</button>
