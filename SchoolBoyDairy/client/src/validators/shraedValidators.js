@@ -1,4 +1,4 @@
-const serverEmailRegExp = "/[a-z0-9\\._%+!$&*=^|~#%'`?{}/\\-]+@([a-z0-9\\-]+\.){1,}([a-z]{2,16})/"
+const serverEmailRegExp = '^(([1-z])@*.*[^\\s]$)'
 const serverPasswordRegExp = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$'
 
 export function isValidEmail (email) {
