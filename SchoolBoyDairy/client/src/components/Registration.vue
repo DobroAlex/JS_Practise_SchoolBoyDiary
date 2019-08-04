@@ -1,6 +1,6 @@
 <template>
-    <div class="regForm">
-        <form class="registration" @submit.prevent="registerMe">
+    <div class="registrationDiv">
+        <form class="registrationForm" @submit.prevent="registerMe">
             <h1>New User Registartion</h1>
 
             <label>E-mail</label>
@@ -92,7 +92,7 @@ export default {
                 if(!this.phoneNumber) {
                     this.phoneNumber = '+79700000000'
                 }
-                const respond = await UsersService.register(this.email.toLowerCase(), this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
+                const response = await UsersService.register(this.email.toLowerCase(), this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
 
                 this.submitStatus = 'OK'
 
