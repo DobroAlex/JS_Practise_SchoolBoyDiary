@@ -25,7 +25,7 @@
 <script>
 import UsersService from "../services/UsersService"
 
-import { required, minLength, between } from 'vuelidate/lib/validators'
+import { required } from 'vuelidate/lib/validators'
 
 export default {
     name: 'login',
@@ -51,7 +51,6 @@ export default {
                 this.submitStatus = 'PENDING'
                 const response = await UsersService.login(this.email.toLowerCase(), this.password)
                 this.submitStatus = 'OK'
-                alert(response.data.token)
                 sessionStorage.setItem('token', response.data.token)
                 sessionStorage.setItem('refreshToken', response.data.refreshToken)
                 this.$router.push({name: 'Me'})
