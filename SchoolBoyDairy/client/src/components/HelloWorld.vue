@@ -87,7 +87,7 @@
 export default {
   name: 'HelloWorld',
   mounted() {
-    this.$router.push("/users")   //this will be replaced with push to /login then proper page will be created
+    this.$router.push("/login")   //this will be replaced with push to /login then proper page will be created
   },
   data () {
     return {
