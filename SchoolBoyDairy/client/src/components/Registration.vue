@@ -12,12 +12,12 @@
             <label>Password</label>
             <input required v-model.lazy="password" type="password" placeholder="password">
             <p class="error" v-if="!$v.password.required && password">Password required</p>
-            <p class="error" v-if="!$v.password.isValidPassword && password">Password must have at least 1 capital & one number</p>
+            <p class="error" v-if="!$v.password.isValidPassword && password">Password must have at least 1 capital and one number</p>
             
             <p>
             <label>Password once again</label>
             <input required v-model.lazy="passwordRep" type="password" placeholder="password once again">
-            <p class="error" v-if="(password !== passwordRep) && passwordRep && password">passwords mismatch</p>
+            <p class="error" v-if="(password !== passwordRep) && passwordRep && password">Passwords mismatch</p>
             
             
             <p>
@@ -72,7 +72,7 @@ export default {
     validations: {
         email: {required},
         password: {required, isValidPassword},
-        password: {required},
+        passwordRep: {required},
         fullName: {required},
         school: {required}
     },
