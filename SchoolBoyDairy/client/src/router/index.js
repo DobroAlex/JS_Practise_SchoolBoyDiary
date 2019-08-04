@@ -4,20 +4,21 @@ import Vuelidate from 'vuelidate'
 import vueTouch from 'vue-touch'
 import Login from '@/components/Login'
 import Registration from '@/components/Registration'
+import Me from '@/components/Me'
 import HelloWorld from '@/components/HelloWorld'
 import Users from '@/components/Users' // this should work. If not, look at replacing / with \\
 import NewUser from '@/components/NewUser'
-import EditUser from "../components/EditUser";
+import EditUser from '@/components/EditUser'
 
-Vue.use(Router);
-Vue.use(Vuelidate);
+Vue.use(Router)
+Vue.use(Vuelidate)
 Vue.use(vueTouch)
 
-export default new Router({ //!!!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
+export default new Router({ //! !!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
   mode: 'history',
   routes: [
     {
-      path:'/login',
+      path: '/login',
       name: 'Login',
       component: Login
     },
@@ -25,6 +26,11 @@ export default new Router({ //!!!!!https://stackoverflow.com/questions/45992932/
       path: '/registration',
       name: 'Registration',
       component: Registration
+    },
+    {
+      path: '/me',
+      name: 'Me',
+      component: Me
     },
     {
       path: '/users',
