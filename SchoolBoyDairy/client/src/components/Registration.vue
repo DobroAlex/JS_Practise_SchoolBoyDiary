@@ -6,7 +6,7 @@
             <label>E-mail</label>
             <input required v-model.lazy="email" type="email" placeholder="somemail@ex.ru">
             <p class="error" v-if="!$v.email.required && email">Emial required</p>
-            <p class="error" v-if="submitStatus==='EMAIL_IN_USE'">{{submitStatus}}</p>
+            <p class="error" v-if="submitStatus==='EMAIL_IN_USE'">This email is already in use</p>
 
             <p>
             <label>Password</label>
@@ -16,7 +16,7 @@
             
             <p>
             <label>Password once again</label>
-            <input required v-model="passwordRep" type="password" placeholder="password once again">
+            <input required v-model.lazy="passwordRep" type="password" placeholder="password once again">
             <p class="error" v-if="(password !== passwordRep) && passwordRep && password">passwords mismatch</p>
             
             
@@ -96,13 +96,13 @@ export default {
 
                 this.submitStatus = 'OK'
 
-                this.$router.push({name: 'Me'})
+                this.$router.push({name: 'Login'})
             }
             catch(e) {
-                if (e.response.status === 422) {
+                if (e.response.status == 422 ) {
                     this.submitStatus = 'EMAIL_IN_USE'
                 }
-                if (e.response.status === 400) {
+                else if (e.response.status == 400) {
                     this.submitStatus = 'MAILFORMED'
                 }
                 else {
