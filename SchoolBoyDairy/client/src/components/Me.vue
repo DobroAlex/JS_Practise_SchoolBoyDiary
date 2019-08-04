@@ -71,7 +71,6 @@ export default {
         getMe: async function() {
             try{
                 const response = await UsersService.getMe({token: sessionStorage.getItem('token')})
-
                 this.fullName = response.data.fullName
                 this.email = response.data.email
                 this.school = response.data.school
@@ -83,14 +82,15 @@ export default {
                 let refresh
                 if (e.response.status == 401) {
                      refresh = await this.refreshMe()
+                    if (refresh) {
+                        await this.getMe()
+                        this.$router.push({name:'Login'})
+                    }
                 }
                 else if (e.response.status == 400) {
                     this.$router.push({name: 'Login'})
                 }
-                if (refresh) {
-                    await this.getMe()
-                    this.$router.push({name:'Login'})
-                }
+
             }
         },
         editButtonClicked: function() {
@@ -135,16 +135,12 @@ export default {
     },
     
     beforeMount() {
-        alert('prem')
          this.getMe()
-         alert('prem2')
     },
     
     mounted() {
-        alert('m')
         document.getElementById('saveChangesButton').style.visibility = "hidden"
         document.getElementById('cancelButton').style.visibility = "hidden"
-        alert('m2')
     }
     
 }
