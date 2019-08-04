@@ -1,6 +1,6 @@
 <template>
-    <div class="authForm">
-        <form class="login"  @submit.prevent="sendLogin" >
+    <div class="loginDiv">
+        <form class="loginClass"  @submit.prevent="sendLogin" >
             <h1>Sign in</h1>
 
             <label>E-mail</label>
@@ -51,8 +51,9 @@ export default {
                 this.submitStatus = 'PENDING'
                 const response = await UsersService.login(this.email.toLowerCase(), this.password)
                 this.submitStatus = 'OK'
-                sessionStorage.setItem('token', response.token)
-                sessionStorage.setItem('refreshToken', response.refreshToken)
+                alert(response.data.token)
+                sessionStorage.setItem('token', response.data.token)
+                sessionStorage.setItem('refreshToken', response.data.refreshToken)
                 this.$router.push({name: 'Me'})
             }
             catch(e) {
