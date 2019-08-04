@@ -1,4 +1,7 @@
-<template>
+<template v-if="isLoading"> 
+</template>
+
+<template v-else>
     <div class="meForm">
         <form class="meClass">
             <h1>My page</h1>
@@ -46,7 +49,8 @@ export default {
             phoneNumber: '',
             description: '',
             isEditing: false,
-            isUpdated: false
+            isUpdated: false,
+            isLoading: true
         }
     },
 
@@ -69,7 +73,8 @@ export default {
         },
 
         getMe: async function() {
-            try{
+            this.isLoading = true
+            try {
                 const response = await UsersService.getMe({token: sessionStorage.getItem('token')})
                 this.fullName = response.data.fullName
                 this.email = response.data.email
@@ -77,6 +82,8 @@ export default {
                 this.schoolClass = response.data.class
                 this.phoneNumber = response.data.phoneNumber
                 this.description = response.data.description
+
+                this.isLoading = false
             }
             catch(e) {
                 let refresh
@@ -135,7 +142,7 @@ export default {
     },
     
     beforeMount() {
-         this.getMe()
+        this.getMe()
     },
     
     mounted() {
