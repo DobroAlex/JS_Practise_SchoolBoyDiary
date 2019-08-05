@@ -141,11 +141,12 @@ export default {
         
     },
     
-    beforeMount() {
+    /*beforeMount() {
         this.getMe()
-    },
+    },*/
     
-    mounted() {
+    async mounted() {
+        await this.getMe()
         document.getElementById('saveChangesButton').style.visibility = "hidden"
         document.getElementById('cancelButton').style.visibility = "hidden"
     }
