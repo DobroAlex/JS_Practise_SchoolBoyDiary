@@ -3,7 +3,7 @@
 
 <template v-else>
     <div class="meForm">
-        <form class="meClass">
+        <form class="meClass" @submit.prevent="saveChangesButtonClicked">
             <h1>My page</h1>
             <label>Full Name:</label>
             <input required v-model="fullName"  :disabled="!isEditing">
@@ -36,6 +36,8 @@
 import UsersService from '../services/UsersService'
 import required from 'vuelidate/lib/validators'
 import { async, all } from 'q'
+import { type } from 'os';
+import { throws } from 'assert';
 
 
 export default {
@@ -50,8 +52,7 @@ export default {
             description: '',
             isEditing: false,
             isUpdated: false,
-            isLoading: true
-        }
+            isLoading: true        }
     },
 
     validations: {
@@ -68,12 +69,16 @@ export default {
                     sessionStorage.setItem('refreshToken', response.data.refreshToken)
                 }
                 catch(e) {
+                    sessionStorage.removeItem('refreshToken')
                     this.$router.push({name: 'Login'})
                 }
         },
 
         getMe: async function() {
             this.isLoading = true
+            if(!sessionStorage.getItem('token') || !sessionStorage.getItem('refreshToken')) {
+                throw new Error
+            }
             try {
                 const response = await UsersService.getMe({token: sessionStorage.getItem('token')})
                 this.fullName = response.data.fullName
@@ -86,15 +91,13 @@ export default {
                 this.isLoading = false
             }
             catch(e) {
-                let refresh
+                sessionStorage.removeItem('token')
                 if (e.response.status == 401) {
-                     refresh = await this.refreshMe()
-                    if (refresh) {
-                        await this.getMe()
-                        this.$router.push({name:'Login'})
-                    }
+                    const refresh = await this.refreshMe()
+                    await this.getMe()
                 }
                 else if (e.response.status == 400) {
+                    sessionStorage.removeItem('refreshToken')
                     this.$router.push({name: 'Login'})
                 }
 
@@ -146,8 +149,8 @@ export default {
     },
     
     mounted() {
-        document.getElementById('saveChangesButton').style.visibility = "hidden"
-        document.getElementById('cancelButton').style.visibility = "hidden"
+       // document.getElementById('saveChangesButton').style.visibility = "hidden"
+       // document.getElementById('cancelButton').style.visibility = "hidden"
     }
     
 }
