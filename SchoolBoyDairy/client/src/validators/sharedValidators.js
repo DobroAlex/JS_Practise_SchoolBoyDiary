@@ -1,19 +1,26 @@
 const serverEmailRegExp = '^(([1-z])@*.*[^\\s]$)'
 const serverPasswordRegExp = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$'
 const serverPhoneNumberRegExp = '^\\+\\d{11}$'
+const serverClassRegExp = '(^(\\d)|(10)|(11))-[а-я]{1}|university$'
 
 function matcher(targetStr, regExp) {
     return !!(targetStr.match(regExp))
 }
 
-export function isValidEmail (email) {
-    return matcher(email, serverEmailRegExp)
-}
+module.exports = {
+    isValidEmail: function  (email) {
+        return matcher(email, serverEmailRegExp)
+    },
 
-export function isValidPassword (password) {
-    return matcher(password, serverPasswordRegExp)
-}
+    isValidPassword: function  (password) {
+        return matcher(password, serverPasswordRegExp)
+    },
 
-export function isValidPhoneNumber(phoneNumber){
-    return matcher(phoneNumber, serverPhoneNumberRegExp)
+    isValidPhoneNumber: function (phoneNumber){
+        return matcher(phoneNumber, serverPhoneNumberRegExp)
+    },
+
+    isValidClass: function (schoolClass) {
+        return matcher(schoolClass, serverClassRegExp)
+    }
 }
