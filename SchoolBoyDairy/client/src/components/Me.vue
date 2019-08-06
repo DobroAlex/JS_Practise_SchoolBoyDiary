@@ -34,7 +34,8 @@
 
 <script>
 import UsersService from '../services/UsersService'
-import {required} from 'vuelidate/lib/validators'
+import { isValidPhoneNumber } from '../validators/sharedValidators'
+import { required } from 'vuelidate/lib/validators'
 import { async, all } from 'q'
 
 export default {
@@ -55,7 +56,8 @@ export default {
 
     validations: {
         fullName: {required},
-        school: {required}
+        school: {required},
+        phoneNumber: {required, isValidPhoneNumber}
     },
 
     methods: {
@@ -102,42 +104,23 @@ export default {
             }
         },
 
-        hideButton: function(id) {
-            document.getElementById(id).style.display = 'none'
-        },
-        
-        showButton: function(id) {
-            document.getElementById(id).style.display = 'run-in'
-        },
-
-        hideSaveAndCancel: function() {
-            this.hideButton ('saveButton')
-            this.hideButton('cancelButton')
-        },
-
-        showSaveAndCancel: function() {
-            this.showButton('saveButton')
-            this.showButton('cancelButton')
-        },
-
         editButtonClicked: function() {
             this.isEditing = true
-            alert(this.isEditing)
-            
-            //this.showSaveAndCancel()
-
-            this.hideButton('editButton')
+            this.isUpdated = false
         },
 
         saveButtonClicked: async function() {
             if (this.$v.$invalid) {
                 return false
             }
+            if (!this.schoolClass.trim()){
+                this.schoolClass = 'university'
+            }
             try {
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
                 this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'))
 
-                alert('Updated success')
+                this.isUpdated = true
 
                 this.isEditing = false
 
@@ -160,18 +143,18 @@ export default {
 
             this.getMe()
 
-            this.showButton('editButton')
         }
         
         
     },
     
     async beforeMount() {
-        await this.getMe()
-    },
-    
-    mounted() {
-        //this.hideSaveAndCancel()
+        try {
+            await this.getMe()
+        }
+        catch(e) {
+            this.$router.push({name: 'Login'})
+        }
     }
     
 }
