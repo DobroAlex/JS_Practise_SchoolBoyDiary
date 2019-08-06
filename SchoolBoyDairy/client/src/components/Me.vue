@@ -26,13 +26,16 @@
                 <textarea v-model="description" :readonly="true"></textarea>
             </p>
             <hr>
-            <button type="button" id="editButton" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
+            <button type="button" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
             <p>
-                <button type="submit" id="saveButton" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
-                <button type="button" id="cancelButton" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
+                <button type="submit" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
+                <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
             </p>
             <p v-if="isUpdated">Updated successfully</p>
         </form>
+
+        <hr>
+        <button type="button">Delete my page</button>
     </div>
 </template>
 
@@ -101,7 +104,7 @@ export default {
                     await this.getMe()
                 }
                 else {
-                    sessionStorage.removeItem('refreshToken')
+                    sessionStorage.clear()
                     this.$router.push({name: 'Login'})
                 }
 
@@ -132,11 +135,13 @@ export default {
 
             }
             catch(e) {
+                sessionStorage.removeItem('token')
                 if (e.response.status == 401) {
                     const refresh = await this.refreshToken()
                     await this.saveButtonClicked()
                 }
                 else {
+                    sessionStorage.clear()
                     this.$router.push({name: 'Login'})
                 }
             }
@@ -147,8 +152,32 @@ export default {
 
             this.getMe()
 
+        },
+
+        deleteButtonClicked: async function() {
+            const resp = prompt("This is very serious decision and this can't be undone. Are you sure? If yes, input your email once more")
+            if (resp.toLowerCase() === this.email) {
+                try{
+                    const resp = await UsersService.deleteMe(sessionStorage.getItem('token'))
+
+                    sessionStorage.clear()
+
+                    alert('Your page was deleted, rederecting you to login page')
+
+                    this.$router.push({name: 'Login'})
+                }
+                catch(e) {
+                    if (e.response.status == 401) {
+                        await this.refreshMe()
+                        await this.deleteButtonClicked()
+                    }
+                    else {
+                        this.$router.push({name: 'Login'})
+                    }
+                }
+            }
+            
         }
-        
         
     },
     
