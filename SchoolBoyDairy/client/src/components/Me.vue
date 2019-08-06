@@ -3,29 +3,29 @@
 
 <template v-else>
     <div class="meForm">
-        <form class="meClass" @submit.prevent="saveChangesButtonClicked">
+        <form class="meClass" @submit.prevent="saveButtonClicked">
             <h1>My page</h1>
             <label>Full Name:</label>
-            <input required v-model="fullName"  :disabled="!isEditing">
+            <input required v-model="fullName"  :readonly="!isEditing">
 
             <label>email:</label>
-            <input v-model="email" :disabled="true">
+            <input required v-model="email" :readonly="true">
 
             <p>
                 <label>School:</label>
-                <input required v-model="school" :disabled="!isEditing">
+                <input required v-model="school" :readonly="!isEditing">
                 <label>Class:</label>
-                <input v-model="schoolClass" :disabled="!isEditing">
+                <input v-model="schoolClass" :readonly="!isEditing">
             </p>
 
             <label>Phone Number:</label>
-            <input required v-model="phoneNumber" :disabled="!isEditing">
+            <input required v-model="phoneNumber" :readonly="!isEditing">
 
             <hr>
-            <button type="button" id="editButton" v-on:click="editButtonClicked">Edit me</button>
+            <button type="button" id="editButton" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
             <p>
-                <button type="submit" id="saveChangesButton"   v-on:click="editButtonClicked">Save</button>
-                <button type="button" id="cancelButton">Cancel</button>
+                <button type="submit" id="saveButton" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
+                <button type="button" id="cancelButton" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
             </p>
             <p v-if="isUpdated">Updated successfully</p>
         </form>
@@ -34,11 +34,8 @@
 
 <script>
 import UsersService from '../services/UsersService'
-import required from 'vuelidate/lib/validators'
+import {required} from 'vuelidate/lib/validators'
 import { async, all } from 'q'
-import { type } from 'os';
-import { throws } from 'assert';
-
 
 export default {
     name: 'me',
@@ -52,7 +49,8 @@ export default {
             description: '',
             isEditing: false,
             isUpdated: false,
-            isLoading: true        }
+            isLoading: true
+        }
     },
 
     validations: {
@@ -62,7 +60,7 @@ export default {
 
     methods: {
 
-        refreshMe: async function(){
+        refreshToken: async function(){
                 try{
                     const response = await UsersService.refreshMe({refreshToken: sessionStorage.getItem('refreshToken')})
                     sessionStorage.setItem('token', response.data.token)
@@ -93,54 +91,78 @@ export default {
             catch(e) {
                 sessionStorage.removeItem('token')
                 if (e.response.status == 401) {
-                    const refresh = await this.refreshMe()
+                    const refresh = await this.refreshToken()
                     await this.getMe()
                 }
-                else if (e.response.status == 400) {
+                else {
                     sessionStorage.removeItem('refreshToken')
                     this.$router.push({name: 'Login'})
                 }
 
             }
         },
-        editButtonClicked: function() {
-            this.isEditing = !this.isEditing
-            const editButton =  document.getElementById('editButton')
-            const saveChangesButton = document.getElementById('saveChangesButton')
-            const cancelButton = document.getElementById('cancelButton')
-            if (this.isEditing) {
-                editButton.style.visibility = 'hidden'
-                saveChangesButton.style.visibility = 'visible'
-                cancelButton.style.visibility = 'visible'
-            }
-            else {
-                 editButton.style.visibility = 'visible'
-                 saveChangesButton.style.visibility = 'hidden'
-                 cancelButton.style.visibility = 'hidden'
-            }
+
+        hideButton: function(id) {
+            document.getElementById(id).style.display = 'none'
         },
-        saveChangesButtonClicked: async function() {
+        
+        showButton: function(id) {
+            document.getElementById(id).style.display = 'run-in'
+        },
+
+        hideSaveAndCancel: function() {
+            this.hideButton ('saveButton')
+            this.hideButton('cancelButton')
+        },
+
+        showSaveAndCancel: function() {
+            this.showButton('saveButton')
+            this.showButton('cancelButton')
+        },
+
+        editButtonClicked: function() {
+            this.isEditing = true
+            alert(this.isEditing)
+            
+            //this.showSaveAndCancel()
+
+            this.hideButton('editButton')
+        },
+
+        saveButtonClicked: async function() {
             if (this.$v.$invalid) {
                 return false
             }
-            try{
+            try {
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
-                    this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'))
+                this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'))
 
-                this.editButtonClicked()
+                alert('Updated success')
 
-                this.isUpdated = true
+                this.isEditing = false
+
+                this.getMe()
+
             }
             catch(e) {
                 if (e.response.status == 401) {
-                    await this.refreshMe()
-                    await this.saveChangesButtonClicked()
+                    const refresh = await this.refreshToken()
+                    await this.saveButtonClicked()
                 }
-                else if(e.response.status == 400) {
+                else {
                     this.$router.push({name: 'Login'})
                 }
             }
+        },
+
+        cancelButtonClicked: function() {
+            this.isEditing = false
+
+            this.getMe()
+
+            this.showButton('editButton')
         }
+        
         
     },
     
@@ -149,8 +171,7 @@ export default {
     },
     
     mounted() {
-       // document.getElementById('saveChangesButton').style.visibility = "hidden"
-       // document.getElementById('cancelButton').style.visibility = "hidden"
+        //this.hideSaveAndCancel()
     }
     
 }
