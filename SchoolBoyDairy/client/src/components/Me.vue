@@ -21,6 +21,10 @@
             <label>Phone Number:</label>
             <input required v-model="phoneNumber" :readonly="!isEditing">
 
+            <p>
+                <label>Description</label>
+                <textarea v-model="description" :readonly="true"></textarea>
+            </p>
             <hr>
             <button type="button" id="editButton" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
             <p>
