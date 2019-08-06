@@ -52,7 +52,7 @@
 <script>
 import UsersService from "../services/UsersService"
 import { required, minLength, between } from 'vuelidate/lib/validators'
-import { isValidEmail, isValidPassword } from "../validators/shraedValidators"
+import { isValidEmail, isValidPassword } from "../validators/sharedValidators"
 import { async } from 'q';
 
 export default {
