@@ -35,13 +35,13 @@
         </form>
 
         <hr>
-        <button type="button">Delete my page</button>
+        <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
     </div>
 </template>
 
 <script>
 import UsersService from '../services/UsersService'
-import { isValidPhoneNumber } from '../validators/sharedValidators'
+import { isValidPhoneNumber, isValidClass } from '../validators/sharedValidators'
 import { required } from 'vuelidate/lib/validators'
 import { async, all } from 'q'
 
@@ -64,7 +64,8 @@ export default {
     validations: {
         fullName: {required},
         school: {required},
-        phoneNumber: {required, isValidPhoneNumber}
+        phoneNumber: {required, isValidPhoneNumber},
+        schoolClass: {required, isValidClass}
     },
 
     methods: {
@@ -156,7 +157,7 @@ export default {
 
         deleteButtonClicked: async function() {
             const resp = prompt("This is very serious decision and this can't be undone. Are you sure? If yes, input your email once more")
-            if (resp.toLowerCase() === this.email) {
+            if (resp !== null && (resp.toLowerCase() === this.email)) {
                 try{
                     const resp = await UsersService.deleteMe(sessionStorage.getItem('token'))
 
@@ -168,7 +169,7 @@ export default {
                 }
                 catch(e) {
                     if (e.response.status == 401) {
-                        await this.refreshMe()
+                        await this.refreshToken()
                         await this.deleteButtonClicked()
                     }
                     else {
@@ -176,6 +177,9 @@ export default {
                     }
                 }
             }
+            else{
+                    alert('Your real and given input mismatch')
+                }
             
         }
         
