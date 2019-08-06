@@ -59,5 +59,13 @@ export default {
     catch(e) {
       throw e
     }
+  },
+  deleteMe(token){
+    try{
+      return Api().delete('/me', {headers:{authorization: 'Bearer' + token}})
+    }
+    catch(e) {
+      throw e
+    }
   }
 }
