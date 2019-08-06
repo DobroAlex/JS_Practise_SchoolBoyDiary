@@ -33,7 +33,7 @@
             <p>
             <label>Class</label>
             <input  v-model="schoolClass" type="text" placeholder="'Number-letter' or empty if university">
-            </p>
+            <p class="error" v-if="!$v.schoolClass.isValidClass && schoolClass">Incorrect class, better leave it empty</p>
 
             <p>
             <label>Phone Number</label>
@@ -52,7 +52,7 @@
 <script>
 import UsersService from "../services/UsersService"
 import { required, minLength, between } from 'vuelidate/lib/validators'
-import { isValidEmail, isValidPassword } from "../validators/sharedValidators"
+import { isValidEmail, isValidPassword, isValidPhoneNumber, isValidClass } from "../validators/sharedValidators"
 import { async } from 'q';
 
 export default {
@@ -74,22 +74,33 @@ export default {
         password: {required, isValidPassword},
         passwordRep: {required},
         fullName: {required},
-        school: {required}
+        school: {required},
+        schoolClass: { isValidClass},
+        phoneNumber: {required, isValidPhoneNumber}
     },
 
     methods: {
         registerMe: async function() {
+            if(this.$v.schoolClass.$invalid) {
+                this.schoolClass = 'university'
+            }
+            if(this.$v.school.$invalid){
+                this.school = '-'
+            }
+            if(this.$v.phoneNumber.$invalid) {
+                this.phoneNumber = '+79700000000'
+            }
             if(this.$v.$invalid) {
                 return false
             }
             try{
                 this.submitStatus = 'PENDING'
 
-                if(!this.schoolClass) {
+                if(!this.schoolClass.trim()) {
                     this.schoolClass = 'university'
                 }
 
-                if(!this.phoneNumber) {
+                if(!this.phoneNumber.trim()) {
                     this.phoneNumber = '+79700000000'
                 }
                 const response = await UsersService.register(this.email.toLowerCase(), this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
