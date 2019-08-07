@@ -138,7 +138,7 @@ export default {
             catch(e) {
                 sessionStorage.removeItem('token')
                 if (e.response.status == 401) {
-                    const refresh = await this.refreshToken()
+                    await this.refreshToken()
                     await this.saveButtonClicked()
                 }
                 else {
@@ -159,7 +159,7 @@ export default {
             const resp = prompt("This is very serious decision and this can't be undone. Are you sure? If yes, input your email once more")
             if (resp !== null && (resp.toLowerCase() === this.email)) {
                 try{
-                    const resp = await UsersService.deleteMe(sessionStorage.getItem('token'))
+                     await UsersService.deleteMe(sessionStorage.getItem('token'))
 
                     sessionStorage.clear()
 
