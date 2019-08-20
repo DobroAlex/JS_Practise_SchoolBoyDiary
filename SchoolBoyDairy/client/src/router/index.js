@@ -9,6 +9,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Users from '@/components/Users' // this should work. If not, look at replacing / with \\
 import NewUser from '@/components/NewUser'
 import EditUser from '@/components/EditUser'
+import AdminPageList from '@/components/AdminPageList'
 
 Vue.use(Router)
 Vue.use(Vuelidate)
