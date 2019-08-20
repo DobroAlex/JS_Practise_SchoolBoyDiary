@@ -9,10 +9,9 @@ module.exports = {
     throw utils.errorGenerator(ajvInstance.errorsText(), 400)
   },
 
-  validateID: async function (Model, id, context) {
+  validateID: async function (Model, id) {
     if (id == null) {
-      context = 404
-      throw new Error('ID is undefined. probably wasn\'t created OR already deleted ')
+      throw utils.errorGenerator(`ID ${id} is undefined. probably wasn\'t created OR already deleted`, 404)
     }
     try {
       const res = !!await Model.findById(id)
@@ -20,7 +19,7 @@ module.exports = {
         throw new Error()
       }
     } catch (error) {
-      throw new Error(`No such user with id: ${id}`)
+      throw utils.errorGenerator(`No such user with id: ${id}`, 404)
     }
   },
 
