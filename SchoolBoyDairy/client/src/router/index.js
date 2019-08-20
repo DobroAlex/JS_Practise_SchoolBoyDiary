@@ -51,6 +51,11 @@ export default new Router({ //! !!!!https://stackoverflow.com/questions/45992932
       path: '/users/:id',
       name: 'EditUser',
       component: EditUser
+    },
+    {
+      path: '/admin/users',
+      name: 'AdminPageList',
+      component: AdminPageList
     }
 
   ]
