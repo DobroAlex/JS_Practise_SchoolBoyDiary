@@ -39,7 +39,7 @@ module.exports = {
   validateAdminRoleAndToken: async function (context, ajv) { // Probably not the best practice in terms of OOP
     const decoded = this.verifyAccessToken(this.getTokenFromHeader(context))
 
-    if (!await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded, context, 403) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
+    if (!await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
       throw utils.errorGenerator(`Attempt to reach admin page while not being one for ${this.verifyAccessToken(this.getTokenFromHeader(context)).email}`, 403)
     }
     return decoded
