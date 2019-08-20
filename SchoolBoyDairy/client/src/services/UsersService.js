@@ -67,5 +67,11 @@ export default {
     catch(e) {
       throw e
     }
-  }
-}
+  },
+  getUsers(token){
+    try{
+      return Api().get('/users', {headers:{authorization: 'Bearer' + token}})
+    }
+    catch(e) {
+      throw e
+    }
