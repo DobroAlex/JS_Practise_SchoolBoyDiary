@@ -101,7 +101,7 @@ export default {
             catch(e) {
                 sessionStorage.removeItem('token')
                 if (e.response.status == 401) {
-                    const refresh = await this.refreshToken()
+                    await this.refreshToken()
                     await this.getMe()
                 }
                 else {
