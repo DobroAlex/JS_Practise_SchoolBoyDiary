@@ -242,18 +242,20 @@ router.put('/me', async (context, next) => {
   })
 })
 
-router.delete('/admin/users/:id', async (context, next) => { // admin wants to delete user
+router.delete('/admin/users', async (context, next) => { // admin wants to delete user
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
-  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
+  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)
 
-  await validator.validateID(User, context.params.id)
+  const targetID = context.request.body.id
 
-  const foundUser = await User.findById(context.params.id)
+  await validator.validateID(User, targetID)
+
+  const foundUser = await User.findById(targetID)
   const userName = foundUser.fullName
   const userMail = foundUser.email
 
-  await User.findByIdAndDelete(context.params.id)
+  await User.findByIdAndDelete(targetID)
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`
   })
