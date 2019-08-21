@@ -2,6 +2,16 @@
     <div class="adminPageList">
         <h1>Users</h1>
         <table>
+            <tr>
+                <td> id </td>
+                <td> full name </td>
+                <td> email </td>
+                <td> description </td>
+                <td> school <td>
+                <td> class </td>
+                <td> phoneNumber </td>
+                <td> role </td>
+            </tr>
             <tr v-for="user in users">
                 <td> {{user._id}} </td>
                 <td> {{user.fullName}} </td>
@@ -10,7 +20,10 @@
                 <td> {{user.school}} </td>
                 <td> {{user.class}} </td>
                 <td> {{user.phoneNumber}} </td>
-                <td> {{users.role}} </td>
+                <td> {{user.role}} </td>
+                <p>
+                    <button type="submit" v-on:click="deleteButtonClicked(user._id)"> Delete </button>
+                </p>
             </tr>
         </table>
     </div>
@@ -31,7 +44,7 @@ export default {
     methods: {
         refreshToken: async function(){
                 try{
-                    const response = await UsersService.refreshMe({refreshToken: sessionStorage.getItem('refreshToken')})
+                    const response = await UsersService.refreshMe(sessionStorage.getItem('refreshToken'))
                     sessionStorage.setItem('token', response.data.token)
                     sessionStorage.setItem('refreshToken', response.data.refreshToken)
                 }
@@ -48,7 +61,7 @@ export default {
             }
             catch(e) {
                 if (e.response.status == 401) {
-                    await UsersService.refreshMe({refreshToken: sessionStorage.getItem('refreshToken')})
+                    await this.refreshToken()
                     await this.getUsers()
                 }
                 else if (e.response.status == 403) {
@@ -59,6 +72,24 @@ export default {
                 else {
                     sessionStorage.clear()
                     this.$router.push({name: 'Login'})
+                }
+            }
+        },
+        deleteButtonClicked: async function(targetID) {
+            try {
+                await UsersService.deleteUser(sessionStorage.getItem('token'), targetID)
+            }
+            catch(e) {
+                if (e.response.status == 401) {
+                    await UsersService.refreshMe()
+                    await deleteButtonClicked(targetID)
+                }
+                else if (e.response.status == 404) {
+                    location.reload(true)
+                }
+                else{
+                    alert(e)
+                    //this.$router.push({name:'Login'})
                 }
             }
         }

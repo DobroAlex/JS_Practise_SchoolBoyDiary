@@ -13,9 +13,6 @@ export default {
   getUser (params) {
     return Api().get('user/' + params.id)
   },
-  deleteUser (id) {
-    return Api().delete('users/' + id)
-  },
   login (email, password) {
     try {
       return Api().post('/public/login', {email: email, password: password})
@@ -31,17 +28,17 @@ export default {
       throw e
     }
   },
-  getMe ({token}) {
+  getMe (token) {
     try {
       return Api().get('/me', {headers: {
-        authorization: 'Bearer' + token
+        authorization: 'Bearer ' + token
       }
       })
     } catch (e) {
       throw e
     }
   },
-  refreshMe ({refreshToken}) {
+  refreshMe (refreshToken) {
     try {
       return Api().post('/me/refresh', {refreshToken: refreshToken})
     } catch (e) {
@@ -52,7 +49,7 @@ export default {
     try {
       return Api().put('/me', {email: email, fullName: fullName, school: school, class: _class, 
         phoneNumber: phoneNumber, description: description}, {headers: {
-          authorization: 'Bearer' + token
+          authorization: 'Bearer ' + token
         }
         })
     }
@@ -60,9 +57,9 @@ export default {
       throw e
     }
   },
-  deleteMe(token){
+  deleteMe(token, targetID){
     try{
-      return Api().delete('/me', {headers:{authorization: 'Bearer' + token}})
+      return Api().delete('/me', {id: targetID}, {headers:{authorization: 'Bearer ' + token}})
     }
     catch(e) {
       throw e
@@ -70,7 +67,15 @@ export default {
   },
   getUsers(token){
     try{
-      return Api().get('admin/users', {headers:{authorization: 'Bearer' + token}})
+      return Api().get('/admin/users', {headers:{authorization: 'Bearer ' + token}})
+    }
+    catch(e) {
+      throw e
+    }
+  },
+  deleteUser(token, targetID){
+    try{
+      return Api().delete('/admin/users',  {headers:{authorization: 'Bearer ' + token}})
     }
     catch(e) {
       throw e
