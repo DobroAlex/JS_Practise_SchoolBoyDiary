@@ -72,7 +72,7 @@ export default {
 
         refreshToken: async function(){
                 try{
-                    const response = await UsersService.refreshMe({refreshToken: sessionStorage.getItem('refreshToken')})
+                    const response = await UsersService.refreshMe(sessionStorage.getItem('refreshToken'))
                     sessionStorage.setItem('token', response.data.token)
                     sessionStorage.setItem('refreshToken', response.data.refreshToken)
                 }
@@ -88,7 +88,7 @@ export default {
                 throw new Error
             }
             try {
-                const response = await UsersService.getMe({token: sessionStorage.getItem('token')})
+                const response = await UsersService.getMe(sessionStorage.getItem('token'))
                 this.fullName = response.data.fullName
                 this.email = response.data.email
                 this.school = response.data.school
