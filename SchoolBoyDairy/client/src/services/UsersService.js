@@ -70,8 +70,10 @@ export default {
   },
   getUsers(token){
     try{
-      return Api().get('/users', {headers:{authorization: 'Bearer' + token}})
+      return Api().get('admin/users', {headers:{authorization: 'Bearer' + token}})
     }
     catch(e) {
       throw e
     }
+  }
+}
