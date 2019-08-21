@@ -146,7 +146,7 @@ router.post('/me/refresh', async (context, next) => {
   })
 })
 
-router.get('/users', async (context, next) => {
+router.get('/admin/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
@@ -154,7 +154,7 @@ router.get('/users', async (context, next) => {
   context.ok({ users: foundUsers })
 })
 
-router.post('/users', async (context, next) => {
+router.post('/admin/users', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body)
@@ -176,7 +176,7 @@ router.post('/users', async (context, next) => {
   })
 })
 
-router.get('/users/:id', async (context, next) => {
+router.get('/admin/users/:id', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validateID(User, context.params.id, context)
@@ -186,7 +186,7 @@ router.get('/users/:id', async (context, next) => {
   context.ok({ user: foundUser })
 })
 
-router.put('/users/:id', async (context, next) => {
+router.put('/admin/users/:id', async (context, next) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validateID(User, context.params.id, context)
@@ -242,7 +242,7 @@ router.put('/me', async (context, next) => {
   })
 })
 
-router.delete('/users/:id', async (context, next) => { // admin wants to delete user
+router.delete('/admin/users/:id', async (context, next) => { // admin wants to delete user
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.params)
