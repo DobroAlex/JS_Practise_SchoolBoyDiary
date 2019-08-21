@@ -49,6 +49,7 @@ export default {
             }
             try{
                 this.submitStatus = 'PENDING'
+                this.email = this.email.trim()
                 const response = await UsersService.login(this.email.toLowerCase(), this.password)
                 this.submitStatus = 'OK'
                 sessionStorage.setItem('token', response.data.token)
