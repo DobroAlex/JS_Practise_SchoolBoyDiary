@@ -40,8 +40,7 @@ export default {
   },
   refreshMe (token) {
     try {
-      //return Api().post('/me/refresh', {refreshToken: token})
-      return Api().post('/me/refresh', { headers: { Authorization: `Bearer ${token}` } })
+      return Api().post('/me/refresh', {refreshToken: token})
     } catch (e) {
       throw e
     }

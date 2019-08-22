@@ -122,12 +122,10 @@ router.post('/public/login', async (context, next) => {
 })
 
 router.post('/me/refresh', async (context, next) => {
-  // const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
-  const decoded = await jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context), jwtUtils.defaultRefreshExpireTime)
+  const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
   const foundUser = await User.findOne({ email: decoded.email })
 
-  // if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
-  if (!foundUser || (jwtUtils.getTokenFromHeader(context) !== foundUser.refreshToken)) {
+  if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
     throw utils.errorGenerator('Both token and refresh token expired, log in again', 401)
   }
   const token = jwtUtils.newAccessToken({
