@@ -22,7 +22,7 @@
                 <td> {{user.phoneNumber}} </td>
                 <td> {{user.role}} </td>
                 <p>
-                    <button type="submit" v-on:click="deleteButtonClicked(user._id)"> Delete </button>
+                    <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
                 </p>
             </tr>
         </table>
@@ -32,7 +32,6 @@
 <script>
 import UsersService from '../services/UsersService'
 import { async, all } from 'q'
-import UsersVue from './Users.vue';
 export default {
     'name': 'AdmiPageList',
     data() {
@@ -60,6 +59,7 @@ export default {
                 this.users = response.data.users
             }
             catch(e) {
+                alert(e)
                 if (e.response.status == 401) {
                     await this.refreshToken()
                     await this.getUsers()
@@ -71,13 +71,13 @@ export default {
                 }
                 else {
                     sessionStorage.clear()
-                    this.$router.push({name: 'Login'})
+                    //this.$router.push({name: 'Login'})
                 }
             }
         },
-        deleteButtonClicked: async function(targetID) {
+        deleteButtonClicked: async function(targetEmail) {
             try {
-                await UsersService.deleteUser(sessionStorage.getItem('token'), targetID)
+                await UsersService.deleteUser(sessionStorage.getItem('token'), targetEmail)
             }
             catch(e) {
                 if (e.response.status == 401) {

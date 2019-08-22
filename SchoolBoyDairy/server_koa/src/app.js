@@ -65,6 +65,7 @@ app.use(async (ctx, next) => {
 app.use(async function (context, next) { // https://github.com/axios/axios/issues/853#issuecomment-351554276
   context.set('Access-Control-Allow-Origin', '*')
   context.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  context.set('Access-Control-Allow-Headers', 'Authorization')
   await next()
 })
 
@@ -121,11 +122,12 @@ router.post('/public/login', async (context, next) => {
 })
 
 router.post('/me/refresh', async (context, next) => {
-  const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
-
+  // const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
+  const decoded = await jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context), jwtUtils.defaultRefreshExpireTime)
   const foundUser = await User.findOne({ email: decoded.email })
 
-  if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
+  // if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
+  if (!foundUser || (jwtUtils.getTokenFromHeader(context) !== foundUser.refreshToken)) {
     throw utils.errorGenerator('Both token and refresh token expired, log in again', 401)
   }
   const token = jwtUtils.newAccessToken({
@@ -245,17 +247,17 @@ router.put('/me', async (context, next) => {
 router.delete('/admin/users', async (context, next) => { // admin wants to delete user
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
-  await validator.validate(ajv, ajvSchems.DELETE_USERS_ID_SCHEMA, context.request.body)
+  await validator.validate(ajv, ajvSchems.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
 
-  const targetID = context.request.body.id
+  const targetEmail = context.request.body.email
 
-  await validator.validateID(User, targetID)
+  await validator.validateID(User, targetEmail)
 
-  const foundUser = await User.findById(targetID)
+  const foundUser = (await User.find({ email: targetEmail }))[0]
   const userName = foundUser.fullName
   const userMail = foundUser.email
 
-  await User.findByIdAndDelete(targetID)
+  await User.findByIdAndDelete(foundUser._id)
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`
   })

@@ -38,9 +38,10 @@ export default {
       throw e
     }
   },
-  refreshMe (refreshToken) {
+  refreshMe (token) {
     try {
-      return Api().post('/me/refresh', {refreshToken: refreshToken})
+      //return Api().post('/me/refresh', {refreshToken: token})
+      return Api().post('/me/refresh', { headers: { Authorization: `Bearer ${token}` } })
     } catch (e) {
       throw e
     }
@@ -73,9 +74,9 @@ export default {
       throw e
     }
   },
-  deleteUser(token, targetID){
+  deleteUser(token, email){
     try{
-      return Api().delete('/admin/users',  {headers:{authorization: 'Bearer ' + token}})
+      return Api().delete('/admin/users', {email: email}, {headers:{authorization: 'Bearer ' + token}})
     }
     catch(e) {
       throw e

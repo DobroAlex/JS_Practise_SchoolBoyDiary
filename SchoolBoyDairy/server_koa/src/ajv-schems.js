@@ -45,13 +45,13 @@ module.exports = Object.freeze({
     },
     required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber']
   },
-  DELETE_USERS_ID_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
-    id: 'DELETE_USERS_ID_SCHEMA',
+  DELETE_USERS_EMAIL_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
+    id: 'DELETE_USERS_EMAIL_SCHEMA',
     type: 'object',
     properties: {
-      id: {
+      email: {
         type: 'string',
-        pattern: '^[0-9a-fA-F]{24}$' // checking if :id is even valid
+        pattern: '^(([1-z])@*.*[^\\s]$)'
       }
     },
     required: ['id']
