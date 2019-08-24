@@ -78,6 +78,8 @@ export default {
         deleteButtonClicked: async function(targetEmail) {
             try {
                 await UsersService.deleteUser(sessionStorage.getItem('token'), targetEmail)
+                
+                await this.getUsers()   // refreshing page after user delition
             }
             catch(e) {
                 if (e.response.status == 401) {
