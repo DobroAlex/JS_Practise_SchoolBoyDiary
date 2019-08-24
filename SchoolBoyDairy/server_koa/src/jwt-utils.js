@@ -45,7 +45,7 @@ module.exports = {
     return decoded
   },
 
-  defaultExpireTime: '1m', // I want to keep it rational
+  defaultExpireTime: '5m', // I want to keep it rational
 
   defaultRefreshExpireTime: '10m',
 
