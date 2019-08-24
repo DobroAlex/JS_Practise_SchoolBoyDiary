@@ -249,7 +249,7 @@ router.delete('/admin/users', async (context, next) => { // admin wants to delet
 
   const targetEmail = context.request.body.email
 
-  await validator.validateID(User, targetEmail)
+  await validator.validateEmail(User, targetEmail)
 
   const foundUser = (await User.find({ email: targetEmail }))[0]
   const userName = foundUser.fullName

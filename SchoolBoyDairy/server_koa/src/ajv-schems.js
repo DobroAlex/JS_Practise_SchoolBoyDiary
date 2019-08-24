@@ -54,7 +54,7 @@ module.exports = Object.freeze({
         pattern: '^(([1-z])@*.*[^\\s]$)'
       }
     },
-    required: ['id']
+    required: ['email']
   },
   REGISTER_USER_SCHEMA: {
     id: 'REGISTER_USER_SCHEMA',

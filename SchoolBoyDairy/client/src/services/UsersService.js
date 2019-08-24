@@ -75,7 +75,12 @@ export default {
   },
   deleteUser(token, email){
     try{
-      return Api().delete('/admin/users', {email: email}, {headers:{authorization: 'Bearer ' + token}})
+      return Api().delete('/admin/users', {headers: { // https://stackoverflow.com/questions/43573297/put-request-with-simple-string-as-request-body
+        Authorization: `Bearer ${token}`
+      },
+      data:{
+        email:email
+      }})
     }
     catch(e) {
       throw e
