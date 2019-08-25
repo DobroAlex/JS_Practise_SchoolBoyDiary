@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Vuelidate from 'vuelidate'
-import VModal from 'vue-js-modal'
 
 import Login from '@/components/Login'
 import Registration from '@/components/Registration'
@@ -14,8 +13,6 @@ import AdminPageList from '@/components/AdminPageList'
 
 Vue.use(Router)
 Vue.use(Vuelidate)
-Vue.use(VModal)
-
 
 export default new Router({ //! !!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
   mode: 'history',
