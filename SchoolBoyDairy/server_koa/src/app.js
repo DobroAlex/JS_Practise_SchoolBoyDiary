@@ -186,15 +186,16 @@ router.get('/admin/users/:id', async (context, next) => {
   context.ok({ user: foundUser })
 })
 
-router.put('/admin/users/:id', async (context, next) => {
+router.put('/admin/users/', async (context, next) => {
+  const requestBody = context.request.body
+
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
-  await validator.validateID(User, context.params.id, context)
+  await validator.validateEmail(User, requestBody.email) // ensuring that given user exists
 
-  await validator.validate(ajv, User, context.request.body)
+  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, requestBody)
 
-  const foundUser = await User.findById(context.params.id, '')
-  let requestBody = context.request.body
+  const foundUser = await User.findOne({ email: requestBody.email }, '')
 
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
