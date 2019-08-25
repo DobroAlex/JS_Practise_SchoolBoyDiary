@@ -1,8 +1,5 @@
 const Router = require('koa-router')
 const validator = require('../validator')
-const jwt = require('koa-jwt')
-const jsonwebtoken = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 const ajv = require('../ajv_init')
 const ajvSchems = require('../ajv-schems')
 const User = require('../../models/user')
@@ -10,7 +7,7 @@ const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
 const router = new Router()
 
-router.post('/me/refresh', async (context, next) => {
+router.post('/me/refresh', async (context) => {
   const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
   const foundUser = await User.findOne({ email: decoded.email })
 
@@ -35,7 +32,7 @@ router.post('/me/refresh', async (context, next) => {
   })
 })
 
-router.get('/me', async (context, next) => {
+router.get('/me', async (context) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
@@ -45,7 +42,7 @@ router.get('/me', async (context, next) => {
   context.ok(foundUser)
 })
 
-router.put('/me', async (context, next) => {
+router.put('/me', async (context) => {
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) // validating token
 
@@ -67,7 +64,7 @@ router.put('/me', async (context, next) => {
   })
 })
 
-router.delete('/me', async (context, next) => { // user wants to delete self
+router.delete('/me', async (context) => { // user wants to delete self
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validateEmail(User, decoded.email)

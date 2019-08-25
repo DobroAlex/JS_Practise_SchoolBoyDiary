@@ -1,9 +1,8 @@
-const koa = require('koa')
-const app = new koa()
+const Koa = require('koa')
+const app = new Koa()
 
 const cors = require('@koa/cors')
 app.use(cors())
-
 
 const bodyParser = require('koa-bodyparser')
 app.use(bodyParser())
@@ -14,25 +13,12 @@ app.use(koaRespond())
 const logger = require('koa-morgan')
 app.use(logger('dev'))
 
-const jwt = require('koa-jwt')
-const jsonwebtoken = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-
-const ajv = require('./ajv_init')
-
-const utils = require('./utils')
-const validator = require('./validator')
-const mongoconnection = require('./mongoconnection')
-const jwtUtils = require('./jwt-utils')
-
-const User = require('../models/user')
-
-const ajvSchems = require('./ajv-schems')
-
 const server = app.listen(8081 || process.env.PORT)
 console.log(`Server is listening to ${server.address().port} `)
 
-const db = mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS, server)
+const mongoconnection = require('./mongoconnection')
+
+mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS, server)
 
 app.use(async function handleError (context, next) {
   try {

@@ -1,7 +1,5 @@
 const Router = require('koa-router')
 const validator = require('../validator')
-const jwt = require('koa-jwt')
-const jsonwebtoken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const ajv = require('../ajv_init')
 const ajvSchems = require('../ajv-schems')
@@ -10,7 +8,7 @@ const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
 const router = new Router()
 
-router.post('/public/register', async (context, next) => {
+router.post('/public/register', async (context) => {
   await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body)
 
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
@@ -35,7 +33,7 @@ router.post('/public/register', async (context, next) => {
   context.ok({ message: `User ${requestBody.fullName}: ${requestBody.email} saved` })
 })
 
-router.post('/public/login', async (context, next) => {
+router.post('/public/login', async (context) => {
   const foundUser = await User.findOne({ email: context.request.body.email }, 'fullName password email role')
   if (!foundUser) {
     throw utils.errorGenerator(`No user ${context.request.body.email} has been found`, 404)

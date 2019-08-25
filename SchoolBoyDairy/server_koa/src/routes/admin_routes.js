@@ -1,17 +1,13 @@
 const Router = require('koa-router')
 const validator = require('../validator')
-const jwt = require('koa-jwt')
-const jsonwebtoken = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 const ajv = require('../ajv_init')
 const ajvSchems = require('../ajv-schems')
 const User = require('../../models/user')
-const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
 
 const router = new Router()
 
-router.get('/admin/users', async (context, next) => {
+router.get('/admin/users', async (context) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
@@ -19,7 +15,7 @@ router.get('/admin/users', async (context, next) => {
   context.ok({ users: foundUsers })
 })
 
-router.post('/admin/users', async (context, next) => {
+router.post('/admin/users', async (context) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body)
@@ -41,7 +37,7 @@ router.post('/admin/users', async (context, next) => {
   })
 })
 
-router.get('/admin/users/:id', async (context, next) => {
+router.get('/admin/users/:id', async (context) => {
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validateID(User, context.params.id, context)
@@ -51,7 +47,7 @@ router.get('/admin/users/:id', async (context, next) => {
   context.ok({ user: foundUser })
 })
 
-router.put('/admin/users/', async (context, next) => {
+router.put('/admin/users/', async (context) => {
   const requestBody = context.request.body
 
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
@@ -76,7 +72,7 @@ router.put('/admin/users/', async (context, next) => {
   })
 })
 
-router.delete('/admin/users', async (context, next) => { // admin wants to delete user
+router.delete('/admin/users', async (context) => { // admin wants to delete user
   await jwtUtils.validateAdminRoleAndToken(context, ajv)
 
   await validator.validate(ajv, ajvSchems.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
