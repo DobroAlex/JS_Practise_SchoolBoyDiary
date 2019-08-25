@@ -1,8 +1,8 @@
-<template v-if="isLoading"> 
-</template>
-
-<template v-else>
-    <div class="meForm">
+<template>
+    <div v-if="isLoading">
+        <label>L O A D I N G </label>
+    </div>
+    <div class="meForm" v-else>
         <form class="meClass" @submit.prevent="saveButtonClicked">
             <h1>My page</h1>
             <label>Full Name:</label>

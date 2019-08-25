@@ -1,5 +1,6 @@
 <template>
-    <div class="registrationDiv">
+    <div class="loader" v-if="submitStatus==='PENDING'"></div>
+    <div class="registrationDiv" v-else>
         <form class="registrationForm" @submit.prevent="registerMe">
             <h1>New User Registartion</h1>
 
@@ -126,6 +127,7 @@ export default {
 </script>
 
 <style>
+@import '../styles/loader.css';
     .error {
         color: red
     }

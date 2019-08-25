@@ -1,5 +1,6 @@
 <template>
-    <div class="loginDiv">
+    <div class="loader" v-if="submitStatus==='PENDING'"></div>
+    <div class="loginDiv" v-else>
         <form class="loginClass"  @submit.prevent="sendLogin" >
             <h1>Sign in</h1>
 
@@ -14,6 +15,8 @@
             <p class="error" v-if="submitStatus==='ERROR'">No such username or password</p>
             <p class="pendingMSG" v-if="submitStatus==='PENING'">Sending, plz wait...</p>
             </form>
+    
+
 
         <form class="goToRegistration">
             <label>Doesn't have account?</label>
@@ -68,6 +71,7 @@ export default {
 </script>
 
 <style>
+@import '../styles/loader.css';
     .error {
         color: red;
     }
