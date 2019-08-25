@@ -85,5 +85,17 @@ export default {
     catch(e) {
       throw e
     }
+  },
+  putUser(token, email, fullName, school, _class, phoneNumber, description ) {
+    try {
+      return Api().put('/admin/users', {email: email, fullName: fullName, school: school, class: _class, 
+        phoneNumber: phoneNumber, description: description}, {headers: {
+          authorization: 'Bearer ' + token
+        }
+        })
+      }
+    catch(e) {
+      throw e
+    }
   }
 }
