@@ -128,9 +128,6 @@ export default {
 
 <style>
 @import '../styles/loader.css';
-    .error {
-        color: red
-    }
-
+@import '../styles/error.css';
 </style>
 

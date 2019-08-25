@@ -72,9 +72,7 @@ export default {
 
 <style>
 @import '../styles/loader.css';
-    .error {
-        color: red;
-    }
+@import '../styles/error.css';
 
     .goToRegistration {
         padding-top: 24px

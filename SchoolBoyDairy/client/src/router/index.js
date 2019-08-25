@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Vuelidate from 'vuelidate'
-import vueTouch from 'vue-touch'
+import VModal from 'vue-js-modal'
+
 import Login from '@/components/Login'
 import Registration from '@/components/Registration'
 import Me from '@/components/Me'
@@ -13,7 +14,8 @@ import AdminPageList from '@/components/AdminPageList'
 
 Vue.use(Router)
 Vue.use(Vuelidate)
-Vue.use(vueTouch)
+Vue.use(VModal)
+
 
 export default new Router({ //! !!!!https://stackoverflow.com/questions/45992932/vuejs-router-doesnt-load-the-component
   mode: 'history',
