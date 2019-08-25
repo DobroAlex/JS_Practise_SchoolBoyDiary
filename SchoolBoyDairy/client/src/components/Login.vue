@@ -73,12 +73,8 @@ export default {
 <style>
 @import '../styles/loader.css';
 @import '../styles/error.css';
-
+@import '../styles/clickableLable.css';
     .goToRegistration {
         padding-top: 24px
-    }
-
-    .clickableLable {
-        color: blue;
     }
 </style>
