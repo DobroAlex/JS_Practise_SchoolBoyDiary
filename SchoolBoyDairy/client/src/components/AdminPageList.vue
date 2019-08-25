@@ -1,5 +1,5 @@
-<template>
-    <div class="adminPageList">
+<template >
+    <div class="adminPageList" v-if="!isModalDisplaying">
         <h1>Users</h1>
         <table>
             <tr>
@@ -23,20 +23,58 @@
                 <td> {{user.role}} </td>
                 <p>
                     <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
+                    <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
                 </p>
             </tr>
         </table>
     </div>
+        <div class="editModal" v-else>
+        <label>Full Name:</label>
+            <input required v-model="fullName">
+
+            <label>email:</label>
+            <input required v-model="email">
+
+            <p>
+                <label>School:</label>
+                <input required v-model="school">
+                <label>Class:</label>
+                <input v-model="schoolClass">
+            </p>
+
+            <label>Phone Number:</label>
+            <input required v-model="phoneNumber">
+
+            <p>
+                <label>Description</label>
+                <textarea v-model="description" ></textarea>
+            </p>
+            <hr>
+            <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
+            <button type="button" v-on:click="saveButtonClicked">Save</button>
+            
+    </div>
 </template>
+
+
+
 
 <script>
 import UsersService from '../services/UsersService'
 import { async, all } from 'q'
+
 export default {
     'name': 'AdmiPageList',
     data() {
         return{
-            users: []
+            users: [],
+            fullName: '',
+            email: '',
+            school: '',
+            schoolClass: '',
+            phoneNumber: '',
+            description: '',
+            isModalDisplaying: false
         }
 
     },
@@ -71,7 +109,7 @@ export default {
                 }
                 else {
                     sessionStorage.clear()
-                    //this.$router.push({name: 'Login'})
+                    this.$router.push({name: 'Login'})
                 }
             }
         },
@@ -83,7 +121,7 @@ export default {
             }
             catch(e) {
                 if (e.response.status == 401) {
-                    await UsersService.refreshMe()
+                    await this.refreshToken()
                     await deleteButtonClicked(targetID)
                 }
                 else if (e.response.status == 404) {
@@ -94,6 +132,40 @@ export default {
                     //this.$router.push({name:'Login'})
                 }
             }
+        },
+        modifyUser: async function(){
+            try {
+                const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
+                    this.schoolClass, this.phoneNumber, this.description)
+            }
+            catch(e) {
+                if (e.response.status == 401) {
+                    await this.refreshToken()
+                    await this.modifyUser()
+                }
+                else{
+                    alert(e.response)
+                    this.$router.push({name: 'Login'})
+                }
+            }
+        },
+        editUserButtonClicked: async function(user) {
+            this.isModalDisplaying = true
+            this.fullName = user.fullName
+            this.email = user.email
+            this.school = user.school
+            this.schoolClass = user.class
+            this.phoneNumber = user.phoneNumber
+            this.description = user.description
+        },
+        saveButtonClicked: async function() {
+            await this.modifyUser()
+            await this.getUsers()
+            this.isModalDisplaying = false
+        },
+        cancelEditButtonClicked: async function() {
+            this.isModalDisplaying = false
+            await this.getUsers()
         }
     },
 
