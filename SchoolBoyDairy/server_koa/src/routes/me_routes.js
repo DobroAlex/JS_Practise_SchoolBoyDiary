@@ -69,11 +69,9 @@ router.delete('/me', async (context) => { // user wants to delete self
 
   await validator.validateEmail(User, decoded.email)
 
-  const foundUser = (await User.find({ email: decoded.email }))[0]
+  const foundUser = await User.findOneAndDelete({ email: decoded.email })
   const userName = foundUser.fullName
   const userMail = foundUser.email
-
-  await User.findByIdAndDelete(foundUser._id)
 
   context.send(201, {
     message: `User ${userName}: ${userMail} deleted`

@@ -81,13 +81,10 @@ router.delete('/admin/users', async (context) => { // admin wants to delete user
 
   await validator.validateEmail(User, targetEmail)
 
-  const foundUser = (await User.find({ email: targetEmail }))[0]
-  const userName = foundUser.fullName
-  const userMail = foundUser.email
+  const foundUser = await User.findOneAndDelete({ email: targetEmail })
 
-  await User.findByIdAndDelete(foundUser._id)
   context.send(201, {
-    message: `User ${userName}: ${userMail} deleted`
+    message: `User ${foundUser.fullName}: ${foundUser.emit} deleted`
   })
 })
 
