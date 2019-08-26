@@ -61,6 +61,7 @@
 
 <script>
 import UsersService from '../services/UsersService'
+import { checkTokensAndRefresh } from '../sharedMethods/sharedMethods'
 import { async, all } from 'q'
 
 export default {
@@ -79,30 +80,21 @@ export default {
 
     },
     methods: {
-        refreshToken: async function(){
-                try{
-                    const response = await UsersService.refreshMe(sessionStorage.getItem('refreshToken'))
-                    sessionStorage.setItem('token', response.data.token)
-                    sessionStorage.setItem('refreshToken', response.data.refreshToken)
-                }
-                catch(e) {
-                    sessionStorage.removeItem('refreshToken')
-                    this.$router.push({name: 'Login'})
-                }
-        },
-
         getUsers: async function() {
+            try {
+                await checkTokensAndRefresh(sessionStorage)
+            }
+            catch(e) {
+                this.$router.push({name: 'Login'})
+            }
+            
             try{
                 const response = await UsersService.getUsers(sessionStorage.getItem('token'))
                 this.users = response.data.users
             }
             catch(e) {
                 alert(e)
-                if (e.response.status == 401) {
-                    await this.refreshToken()
-                    await this.getUsers()
-                }
-                else if (e.response.status == 403) {
+                if (e.response.status == 403) {
                     alert('Hey, you are not admin, watcha doin\' here?')
                     sessionStorage.clear()
                     this.$router.push({name: 'Login'})

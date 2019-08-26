@@ -97,5 +97,21 @@ export default {
     catch(e) {
       throw e
     }
+  },
+  checkToken(token) {
+    try{
+      return Api().post('/me/checkToken', {token: token})
+    }
+    catch(e) {
+      throw e
+    }
+  },
+  checkRefreshToken(refreshToken) {
+    try {
+      return Api().post('/me/checkRefreshToken', {refreshToken: refreshToken})
+    }
+    catch(e) {
+      throw e
+    }
   }
 }

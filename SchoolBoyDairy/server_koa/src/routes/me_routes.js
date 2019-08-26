@@ -7,6 +7,16 @@ const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
 const router = new Router()
 
+router.post('/me/checkToken', async (context) => {
+  await jwtUtils.verifyAccessToken(context.request.body.token)
+  context.ok({ token: 'OK' })
+})
+
+router.post('/me/checkRefreshToken', async (context) => {
+  await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
+  context.ok({ refreshToken: 'OK' })
+})
+
 router.post('/me/refresh', async (context) => {
   const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
   const foundUser = await User.findOne({ email: decoded.email })
