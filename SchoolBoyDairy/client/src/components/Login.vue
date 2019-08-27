@@ -4,13 +4,15 @@
             :classes="['v--modal']"
             :pivot-y="0.2"
             :width="240"
-            :height="110"
+            :height="84"
             >
             <div class="errorModalHeader">ERROR</div>
             <div class="errorModalContent">
                 <label> Incorrect login or password </label>
                 <br>
-                <button class="errorOkButton" v-on:click="modalOkClicked">OK</button>
+                <div class="transparentBckgLine">
+                    <button class="errorOkButton" v-on:click="modalOkClicked">OK</button>
+                </div>
             </div>
         </modal>
 
@@ -105,4 +107,5 @@ export default {
 @import '../styles/error.css';
 @import '../styles/clickableLable.css';
 @import '../styles/errorLogin.css';
+@import '../styles/transparentBckgLine.css';
 </style>
