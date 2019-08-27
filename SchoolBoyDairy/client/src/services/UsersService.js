@@ -86,10 +86,10 @@ export default {
       throw e
     }
   },
-  putUser(token, email, fullName, school, _class, phoneNumber, description ) {
+  putUser(token, email, fullName, school, _class, phoneNumber, description, role ) {
     try {
       return Api().put('/admin/users', {email: email, fullName: fullName, school: school, class: _class, 
-        phoneNumber: phoneNumber, description: description}, {headers: {
+        phoneNumber: phoneNumber, description: description, role:role}, {headers: {
           authorization: 'Bearer ' + token
         }
         })

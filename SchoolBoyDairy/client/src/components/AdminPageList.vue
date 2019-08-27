@@ -1,4 +1,4 @@
-<template >
+<template>
     <div class="adminPageList" v-if="!isModalDisplaying">
         <h1>Users</h1>
         <table>
@@ -49,10 +49,19 @@
                 <label>Description</label>
                 <textarea v-model="description" ></textarea>
             </p>
+
+            <p>
+                <label>Role</label>
+                <br>
+                <input type="radio" name="role" value="admin" id="radioAdmin">Admin
+                <br>
+                <input type="radio" name="role" value="user" id="radioUser">User
+            </p>
             <hr>
             <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
             <button type="button" v-on:click="saveButtonClicked">Save</button>
             
+            <div class="loader" v-if="submitStatus === 'PENDING'"></div>
     </div>
 </template>
 
@@ -75,12 +84,14 @@ export default {
             schoolClass: '',
             phoneNumber: '',
             description: '',
-            isModalDisplaying: false
+            isModalDisplaying: false,
+            submitStatus: 'OK'
         }
 
     },
     methods: {
         getUsers: async function() {
+            this.submitStatus='PENDING'
             await checkTokensAndRefrsh(sessionStorage, this.$router)
             
             try{
@@ -99,19 +110,21 @@ export default {
                     this.$router.push({name: 'Login'})
                 }
             }
+            finally {
+                this.submitStatus = 'OK'
+            }
         },
         deleteButtonClicked: async function(targetEmail) {
+            this.submitStatus='PENDING'
+            await checkTokensAndRefrsh(sessionStorage, this.$router)
+
             try {
                 await UsersService.deleteUser(sessionStorage.getItem('token'), targetEmail)
                 
                 await this.getUsers()   // refreshing page after user delition
             }
             catch(e) {
-                if (e.response.status == 401) {
-                    await this.refreshToken()
-                    await deleteButtonClicked(targetID)
-                }
-                else if (e.response.status == 404) {
+                if (e.response.status == 404) {
                     location.reload(true)
                 }
                 else{
@@ -121,23 +134,22 @@ export default {
             }
         },
         modifyUser: async function(){
+            await checkTokensAndRefrsh(sessionStorage, this.$router)
+            this.submitStatus = 'PENDING'
             try {
                 const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
-                    this.schoolClass, this.phoneNumber, this.description)
+                    this.schoolClass, this.phoneNumber, this.description, this.role)
             }
             catch(e) {
-                if (e.response.status == 401) {
-                    await this.refreshToken()
-                    await this.modifyUser()
-                }
-                else{
-                    alert(e.response)
-                    this.$router.push({name: 'Login'})
-                }
+                
+            }
+            finally {
+                this.submitStatus = 'OK'
             }
         },
         editUserButtonClicked: async function(user) {
             this.isModalDisplaying = true
+
             this.fullName = user.fullName
             this.email = user.email
             this.school = user.school
@@ -166,3 +178,8 @@ export default {
     }
 }
 </script>
+
+<style>
+@import '../styles/loader.css';
+
+</style>
