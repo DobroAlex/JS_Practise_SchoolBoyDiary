@@ -61,7 +61,7 @@
 
 <script>
 import UsersService from '../services/UsersService'
-import { checkTokensAndRefresh } from '../sharedMethods/sharedMethods'
+import { checkTokensAndRefrsh } from '../sharedMethods/sharedMethods'
 import { async, all } from 'q'
 
 export default {
@@ -81,12 +81,7 @@ export default {
     },
     methods: {
         getUsers: async function() {
-            try {
-                await checkTokensAndRefresh(sessionStorage)
-            }
-            catch(e) {
-                this.$router.push({name: 'Login'})
-            }
+            await checkTokensAndRefrsh(sessionStorage, this.$router)
             
             try{
                 const response = await UsersService.getUsers(sessionStorage.getItem('token'))
