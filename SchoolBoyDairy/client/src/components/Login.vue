@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="defaultPageStyle">
         <modal name='errorLogin'
             :classes="['v--modal']"
             :pivot-y="0.2"
@@ -20,14 +20,15 @@
         <div class="loginDiv" v-else>
             <form class="loginClass"  @submit.prevent="sendLogin" >
                 <h1>Sign in</h1>
+                <hr>
 
                 <label>E-mail</label>
                 <input required v-model.lazy="email" type="email" placeholder="somemail@ex.ru"/>
                 
                 <label>Password</label>
                 <input required v-model.lazy="password" type="password" placeholder="password"/>
-
                 <hr>
+
                 <button type="submit" :disabled="submitStatus==='PENDING'" v-on:click="sendLogin">Log in</button>
                 <p class="error" v-if="submitStatus==='ERROR'">No such username or password</p>
                 <p class="pendingMSG" v-if="submitStatus==='PENING'">Sending, plz wait...</p>
@@ -103,6 +104,7 @@ export default {
 </script>
 
 <style>
+@import '../styles/defaultPageStyle.css';
 @import '../styles/loader.css';
 @import '../styles/error.css';
 @import '../styles/clickableLable.css';
