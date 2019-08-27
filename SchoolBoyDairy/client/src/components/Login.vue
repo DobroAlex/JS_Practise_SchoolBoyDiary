@@ -1,14 +1,16 @@
 <template>
     <div>
         <modal name='errorLogin'
-            :classes="['v--modal', 'error-modal']"
+            :classes="['v--modal']"
             :pivot-y="0.2"
             :width="240"
-            :height="60"
+            :height="110"
             >
-            <div class="error-modal-content">
+            <div class="errorModalHeader">ERROR</div>
+            <div class="errorModalContent">
                 <label> Incorrect login or password </label>
-                <button v-on:click="modalOkClicked">OK</button>
+                <br>
+                <button class="errorOkButton" v-on:click="modalOkClicked">OK</button>
             </div>
         </modal>
 
@@ -102,7 +104,5 @@ export default {
 @import '../styles/loader.css';
 @import '../styles/error.css';
 @import '../styles/clickableLable.css';
-    .goToRegistration {
-        padding-top: 24px
-    }
+@import '../styles/errorLogin.css';
 </style>
