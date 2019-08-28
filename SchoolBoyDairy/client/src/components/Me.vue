@@ -27,7 +27,7 @@
                 <hr>
                 <button type="button" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
                 <p>
-                    <button type="submit" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
+                    <button type="button" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
                     <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
                 </p>
                 <p v-if="isUpdated">Updated successfully</p>
@@ -56,6 +56,7 @@ export default {
             schoolClass: '',
             phoneNumber: '',
             description: '',
+            role: '',
             isEditing: false,
             isUpdated: false,
             isLoading: true
@@ -76,14 +77,15 @@ export default {
             await checkTokensAndRefrsh(sessionStorage, this.$router)
 
             try {
-                const response = await UsersService.getMe(sessionStorage.getItem('token'))
-                this.fullName = response.data.fullName
-                this.email = response.data.email
-                this.school = response.data.school
-                this.schoolClass = response.data.class
-                this.phoneNumber = response.data.phoneNumber
-                this.description = response.data.description
-
+                let response = await UsersService.getMe(sessionStorage.getItem('token'))
+                response = response.data
+                this.fullName = response.fullName
+                this.email = response.email
+                this.school = response.school
+                this.schoolClass = response.class
+                this.phoneNumber = response.phoneNumber
+                this.description = response.description
+                this.role = response.role
                 this.isLoading = false
             }
             catch(e) {
@@ -105,9 +107,12 @@ export default {
                 this.schoolClass = 'university'
             }
             try {
+                alert(1)
+                await checkTokensAndRefrsh(sessionStorage, this.$router)    
+                alert(2)
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
-                this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'))
-
+                this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'), this.role)
+alert(3)
                 this.isUpdated = true
 
                 this.isEditing = false
@@ -116,15 +121,8 @@ export default {
 
             }
             catch(e) {
-                sessionStorage.removeItem('token')
-                if (e.response.status == 401) {
-                    await this.refreshToken()
-                    await this.saveButtonClicked()
-                }
-                else {
-                    sessionStorage.clear()
-                    this.$router.push({name: 'Login'})
-                }
+                sessionStorage.clear()
+                this.$router.push({name: 'Login'})
             }
         },
 

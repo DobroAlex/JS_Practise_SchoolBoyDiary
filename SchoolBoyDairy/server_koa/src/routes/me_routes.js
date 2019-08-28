@@ -47,7 +47,7 @@ router.get('/me', async (context) => {
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
 
-  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
+  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber role')
 
   context.ok(foundUser)
 })
