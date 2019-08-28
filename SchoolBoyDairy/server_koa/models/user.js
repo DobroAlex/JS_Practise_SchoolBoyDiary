@@ -10,7 +10,7 @@ const UserSchmea = new Schema({
   email: String,
   password: String, // should be stored like bcrypt.hash(plainTextPassword, utils.HashRound). DON'T save plaintext
   role: String, // either user or admin
-  refreshToken: String // TODO: should probably move it to separete collection
+  refreshToken: String
 })
 
 const User = mongoose.model('User', UserSchmea)

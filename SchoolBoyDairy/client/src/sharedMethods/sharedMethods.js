@@ -13,11 +13,6 @@ import UsersService from '../services/UsersService';
         return result.body.token
     }
 
-    async function checkRefreshToken(refreshToken) {
-        const result = await UsersService.checkRefreshToken(refreshToken)
-        return result.body.refreshToken
-    }
-
     export async function checkTokensAndRefrsh(sStorage, router) {
         try {
             const resToken = await checkToken(getTokenFromSessStor(sStorage))
