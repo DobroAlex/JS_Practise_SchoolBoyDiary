@@ -1,46 +1,47 @@
 <template>
-    <div v-if="isLoading">
-        <label>L O A D I N G </label>
-    </div>
-    <div class="meForm" v-else>
-        <form class="meClass" @submit.prevent="saveButtonClicked">
-            <h1>My page</h1>
-            <label>Full Name:</label>
-            <input required v-model="fullName"  :readonly="!isEditing">
+    <div>
+        <div class="loader" v-if="isLoading === true"></div>
+        <div class="meForm" v-else>
+            <form class="meClass" @submit.prevent="saveButtonClicked">
+                <h1>My page</h1>
+                <label>Full Name:</label>
+                <input required v-model="fullName"  :readonly="!isEditing">
 
-            <label>email:</label>
-            <input required v-model="email" :readonly="true">
+                <label>email:</label>
+                <input required v-model="email" :readonly="true">
 
-            <p>
-                <label>School:</label>
-                <input required v-model="school" :readonly="!isEditing">
-                <label>Class:</label>
-                <input v-model="schoolClass" :readonly="!isEditing">
-            </p>
+                <p>
+                    <label>School:</label>
+                    <input required v-model="school" :readonly="!isEditing">
+                    <label>Class:</label>
+                    <input v-model="schoolClass" :readonly="!isEditing">
+                </p>
 
-            <label>Phone Number:</label>
-            <input required v-model="phoneNumber" :readonly="!isEditing">
+                <label>Phone Number:</label>
+                <input required v-model="phoneNumber" :readonly="!isEditing">
 
-            <p>
-                <label>Description</label>
-                <textarea v-model="description" :readonly="true"></textarea>
-            </p>
+                <p>
+                    <label>Description</label>
+                    <textarea v-model="description" :readonly="true"></textarea>
+                </p>
+                <hr>
+                <button type="button" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
+                <p>
+                    <button type="submit" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
+                    <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
+                </p>
+                <p v-if="isUpdated">Updated successfully</p>
+            </form>
+
             <hr>
-            <button type="button" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
-            <p>
-                <button type="submit" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
-                <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
-            </p>
-            <p v-if="isUpdated">Updated successfully</p>
-        </form>
-
-        <hr>
-        <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
+            <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
+        </div>
     </div>
 </template>
 
 <script>
 import UsersService from '../services/UsersService'
+import { checkTokensAndRefrsh } from '../sharedMethods/sharedMethods'
 import { isValidPhoneNumber, isValidClass } from '../validators/sharedValidators'
 import { required } from 'vuelidate/lib/validators'
 import { async, all } from 'q'
@@ -70,23 +71,10 @@ export default {
 
     methods: {
 
-        refreshToken: async function(){
-                try{
-                    const response = await UsersService.refreshMe(sessionStorage.getItem('refreshToken'))
-                    sessionStorage.setItem('token', response.data.token)
-                    sessionStorage.setItem('refreshToken', response.data.refreshToken)
-                }
-                catch(e) {
-                    sessionStorage.removeItem('refreshToken')
-                    this.$router.push({name: 'Login'})
-                }
-        },
-
         getMe: async function() {
             this.isLoading = true
-            if(!sessionStorage.getItem('token') || !sessionStorage.getItem('refreshToken')) {
-                throw new Error
-            }
+            await checkTokensAndRefrsh(sessionStorage, this.$router)
+
             try {
                 const response = await UsersService.getMe(sessionStorage.getItem('token'))
                 this.fullName = response.data.fullName
@@ -99,16 +87,8 @@ export default {
                 this.isLoading = false
             }
             catch(e) {
-                sessionStorage.removeItem('token')
-                if (e.response.status == 401) {
-                    await this.refreshToken()
-                    await this.getMe()
-                }
-                else {
-                    sessionStorage.clear()
-                    this.$router.push({name: 'Login'})
-                }
-
+                    sessionStorage.clear()  // This shouldn't occur normally unless server is dead
+                    this.$router.push({name: 'Login'})  // In such case user must be transfered to login
             }
         },
 
@@ -159,7 +139,9 @@ export default {
             const resp = prompt("This is very serious decision and this can't be undone. Are you sure? If yes, input your email once more")
             if (resp !== null && (resp.toLowerCase() === this.email)) {
                 try{
-                     await UsersService.deleteMe(sessionStorage.getItem('token'))
+                    checkTokensAndRefrsh(sessionStorage, this.$router)
+
+                    await UsersService.deleteMe(sessionStorage.getItem('token'))
 
                     sessionStorage.clear()
 
@@ -168,17 +150,11 @@ export default {
                     this.$router.push({name: 'Login'})
                 }
                 catch(e) {
-                    if (e.response.status == 401) {
-                        await this.refreshToken()
-                        await this.deleteButtonClicked()
-                    }
-                    else {
-                        this.$router.push({name: 'Login'})
-                    }
+                    this.$router.push({name: 'Login'})
                 }
             }
             else{
-                    alert('Your real and given input mismatch')
+                    alert('Your real email and given input mismatch')
                 }
             
         }
