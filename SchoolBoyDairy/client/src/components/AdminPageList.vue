@@ -1,74 +1,74 @@
 <template>
-<div>
-    <div class="editModal" v-if="isModalDisplaying === true">
-        <label>Full Name:</label>
-            <input required v-model="fullName">
+    <div class="defaultPageStyle">
+        <div class="editModal" v-if="isModalDisplaying === true">
+            <label>Full Name:</label>
+                <input required v-model="fullName">
 
-            <label>email:</label>
-            <input required v-model="email">
+                <label>email:</label>
+                <input required v-model="email">
 
-            <p>
-                <label>School:</label>
-                <input required v-model="school">
-                <label>Class:</label>
-                <input v-model="schoolClass">
-            </p>
+                <p>
+                    <label>School:</label>
+                    <input required v-model="school">
+                    <label>Class:</label>
+                    <input v-model="schoolClass">
+                </p>
 
-            <label>Phone Number:</label>
-            <input required v-model="phoneNumber">
+                <label>Phone Number:</label>
+                <input required v-model="phoneNumber">
 
-            <p>
-                <label>Description</label>
-                <textarea v-model="description" ></textarea>
-            </p>
+                <p>
+                    <label>Description</label>
+                    <textarea v-model="description" ></textarea>
+                </p>
 
-            <p>
-                <label>Role</label>
-                <br>
-                <input type="radio" name="role" value="admin" id="radioAdmin">Admin
-                <br>
-                <input type="radio" name="role" value="user" id="radioUser">User
-            </p>
-            <hr>
-            <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
-            <button type="button" v-on:click="saveButtonClicked">Save</button>
-            
+                <p>
+                    <label>Role</label>
+                    <br>
+                    <input type="radio" name="role" value="admin" id="radioAdmin">Admin
+                    <br>
+                    <input type="radio" name="role" value="user" id="radioUser">User
+                </p>
+                <hr>
+                <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
+                <button type="button" v-on:click="saveButtonClicked">Save</button>
+                
+                <div class="loader" v-if="submitStatus === 'PENDING'"></div>
+        </div>
+        <div class="adminPageList" v-if="!isModalDisplaying">
             <div class="loader" v-if="submitStatus === 'PENDING'"></div>
-    </div>
-    <div class="adminPageList" v-if="!isModalDisplaying">
-        <div class="loader" v-if="submitStatus === 'PENDING'"></div>
-        <div v-else>
-            <h1>Users</h1>
-            <table>
-                <tr>
-                    <td> id </td>
-                    <td> full name </td>
-                    <td> email </td>
-                    <td> description </td>
-                    <td> school <td>
-                    <td> class </td>
-                    <td> phoneNumber </td>
-                    <td> role </td>
-                </tr>
-                <tr v-for="user in users">
-                    <td> {{user._id}} </td>
-                    <td> {{user.fullName}} </td>
-                    <td> {{user.email}} </td>
-                    <td> {{user.description}} </td>
-                    <td> {{user.school}} </td>
-                    <td> {{user.class}} </td>
-                    <td> {{user.phoneNumber}} </td>
-                    <td> {{user.role}} </td>
-                    <p>
-                        <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
-                        <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
-                    </p>
-                    <div class="loader" v-if="submitStatus === 'DELETING'"></div>
-                </tr>
-            </table>
-    </div>
-    </div>
-        
+            <div v-else>
+                <h1>Users</h1>
+                <table>
+                    <tr>
+                        <td> id </td>
+                        <td> full name </td>
+                        <td> email </td>
+                        <td> description </td>
+                        <td> school <td>
+                        <td> class </td>
+                        <td> phoneNumber </td>
+                        <td> role </td>
+                    </tr>
+                    <tr v-for="user in users">
+                        <td> {{user._id}} </td>
+                        <td> {{user.fullName}} </td>
+                        <td> {{user.email}} </td>
+                        <td> {{user.description}} </td>
+                        <td> {{user.school}} </td>
+                        <td> {{user.class}} </td>
+                        <td> {{user.phoneNumber}} </td>
+                        <td> {{user.role}} </td>
+                        <p>
+                            <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
+                            <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
+                        </p>
+                        <div class="loader" v-if="submitStatus === 'DELETING'"></div>
+                    </tr>
+                </table>
+            </div>
+        </div>
+            
     </div>
 </template>
 
@@ -187,6 +187,6 @@ export default {
 </script>
 
 <style>
-@import '../styles/loader.css';
-
+    @import '../styles/loader.css';
+    @import '../styles/defaultPageStyle.css';
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="defaulPtageStyle">
         <div class="loader" v-if="isLoading === true"></div>
         <div class="meForm" v-else>
             <form class="meClass" @submit.prevent="saveButtonClicked">
@@ -172,3 +172,7 @@ export default {
     
 }
 </script>
+
+<style>
+    @import '../styles/defaultPageStyle.css';
+</style>

@@ -104,10 +104,10 @@ export default {
 </script>
 
 <style>
-@import '../styles/defaultPageStyle.css';
-@import '../styles/loader.css';
-@import '../styles/error.css';
-@import '../styles/clickableLable.css';
-@import '../styles/errorLogin.css';
-@import '../styles/transparentBckgLine.css';
+    @import '../styles/defaultPageStyle.css';
+    @import '../styles/loader.css';
+    @import '../styles/error.css';
+    @import '../styles/clickableLable.css';
+    @import '../styles/errorLogin.css';
+    @import '../styles/transparentBckgLine.css';
 </style>
