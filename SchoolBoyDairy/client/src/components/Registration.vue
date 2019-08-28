@@ -6,7 +6,7 @@
             :width="240"
             :height="240"
             >
-            <div class="successRegHeader">ERROR</div>
+            <div class="successRegHeader">success!</div>
             <div class="successRegContent">
                 <label> You have completed registation </label>
                 <br>
@@ -19,7 +19,7 @@
         </modal>
         <div class="loader" v-if="submitStatus==='PENDING'"></div>
         <div class="registrationDiv" v-else>
-            <form class="registrationForm" @submit.prevent="registerMe">
+            <form class="registrationForm" @submit.prevent="registerMeButtonClicked">
                 <h1>New User Registartion</h1>
 
                 <label>E-mail</label>
@@ -59,11 +59,10 @@
                 <input   v-model="phoneNumber" type="tel" placeholder="+12300000000">
                 </p>
 
-            <button type="submit" :disabled="submitStatus==='PENDING'" @click="registerMe">Register me</button>
+            <button type="submit" :disabled="submitStatus==='PENDING'" @click="registerMeButtonClicked">Register me</button>
             <p class="OK" v-if="submitStatus==='OK'">Successes!</p>
             <p class="error" v-if="submitStatus==='MAILFORMED'">Check form once more</p>
             <p class="error" v-if="submitStatus==='NET_ERROR'">There is something wrong with network, refresh this page</p>
-            <p class="pendingMSG" v-if="submitStatus==='PENING'">Registarting you, plz wait..</p>
             </form>
         </div>
     </div>
@@ -73,7 +72,7 @@
 import UsersService from "../services/UsersService"
 import { required, minLength, between } from 'vuelidate/lib/validators'
 import { isValidEmail, isValidPassword, isValidPhoneNumber, isValidClass } from "../validators/sharedValidators"
-import {registerModal, showModal, hideModal, getModalFromThis}  from '../sharedMethods/sharedModalMethods'
+import { registerModal, showModal, hideModal, getModalFromThis }  from '../sharedMethods/sharedModalMethods'
 import { async } from 'q';
 
 export default {
@@ -101,7 +100,7 @@ export default {
     },
 
     methods: {
-        registerMe: async function() {
+        registerMeButtonClicked: async function() {
             if(this.$v.schoolClass.$invalid) {
                 this.schoolClass = 'university'
             }
@@ -114,6 +113,7 @@ export default {
             if(this.$v.$invalid) {
                 return false
             }
+
             try{
                 this.submitStatus = 'PENDING'
 
@@ -124,7 +124,8 @@ export default {
                 if(!this.phoneNumber.trim()) {
                     this.phoneNumber = '+79700000000'
                 }
-                const response = await UsersService.register(this.email.toLowerCase(), this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
+
+                await  this.registerMe()
 
                 this.submitStatus = 'OK'
 
@@ -134,6 +135,7 @@ export default {
                     this.$router.push({name: 'Login'}) // redirecting to me in  3 sec
                 }, 3000)    
             }
+
             catch(e) {
                 if (e.response.status == 422 ) {
                     this.submitStatus = 'EMAIL_IN_USE'
@@ -146,6 +148,11 @@ export default {
                 }
             }
         },
+
+        registerMe: async function() {
+                const response = await UsersService.register(this.email.toLowerCase(), this.password, this.fullName, this.school, this.schoolClass, this.phoneNumber)
+        },
+
         successRegOkButtonClicked: function() {
             this.$router.push({name: 'Login'})
         }
