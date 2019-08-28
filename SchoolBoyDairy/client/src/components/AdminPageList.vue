@@ -1,34 +1,6 @@
 <template>
-    <div class="adminPageList" v-if="!isModalDisplaying">
-        <h1>Users</h1>
-        <table>
-            <tr>
-                <td> id </td>
-                <td> full name </td>
-                <td> email </td>
-                <td> description </td>
-                <td> school <td>
-                <td> class </td>
-                <td> phoneNumber </td>
-                <td> role </td>
-            </tr>
-            <tr v-for="user in users">
-                <td> {{user._id}} </td>
-                <td> {{user.fullName}} </td>
-                <td> {{user.email}} </td>
-                <td> {{user.description}} </td>
-                <td> {{user.school}} </td>
-                <td> {{user.class}} </td>
-                <td> {{user.phoneNumber}} </td>
-                <td> {{user.role}} </td>
-                <p>
-                    <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
-                    <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
-                </p>
-            </tr>
-        </table>
-    </div>
-        <div class="editModal" v-else>
+<div>
+    <div class="editModal" v-if="isModalDisplaying === true">
         <label>Full Name:</label>
             <input required v-model="fullName">
 
@@ -62,6 +34,41 @@
             <button type="button" v-on:click="saveButtonClicked">Save</button>
             
             <div class="loader" v-if="submitStatus === 'PENDING'"></div>
+    </div>
+    <div class="adminPageList" v-if="!isModalDisplaying">
+        <div class="loader" v-if="submitStatus === 'PENDING'"></div>
+        <div v-else>
+            <h1>Users</h1>
+            <table>
+                <tr>
+                    <td> id </td>
+                    <td> full name </td>
+                    <td> email </td>
+                    <td> description </td>
+                    <td> school <td>
+                    <td> class </td>
+                    <td> phoneNumber </td>
+                    <td> role </td>
+                </tr>
+                <tr v-for="user in users">
+                    <td> {{user._id}} </td>
+                    <td> {{user.fullName}} </td>
+                    <td> {{user.email}} </td>
+                    <td> {{user.description}} </td>
+                    <td> {{user.school}} </td>
+                    <td> {{user.class}} </td>
+                    <td> {{user.phoneNumber}} </td>
+                    <td> {{user.role}} </td>
+                    <p>
+                        <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
+                        <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
+                    </p>
+                    <div class="loader" v-if="submitStatus === 'DELETING'"></div>
+                </tr>
+            </table>
+    </div>
+    </div>
+        
     </div>
 </template>
 
@@ -115,7 +122,7 @@ export default {
             }
         },
         deleteButtonClicked: async function(targetEmail) {
-            this.submitStatus='PENDING'
+            this.submitStatus='DELETING'
             await checkTokensAndRefrsh(sessionStorage, this.$router)
 
             try {
@@ -147,7 +154,7 @@ export default {
                 this.submitStatus = 'OK'
             }
         },
-        editUserButtonClicked: async function(user) {
+        editUserButtonClicked:  function(user) {
             this.isModalDisplaying = true
 
             this.fullName = user.fullName
