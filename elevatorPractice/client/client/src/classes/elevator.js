@@ -37,6 +37,11 @@ class Elevator {
       if (isBetween(this.floors[0], this.floors[1], floor)) {
         await this.floors.splice(1, 0, floor) //  similar to previous in goingUp: pushing level in between two neighboors
       }
+      if (floor < this.floors[this.floors.length - 1]) {
+        await this.floors.push(floor)
+      }
+    } else {
+      await this.floors.push(floor)
     }
   }
 }
