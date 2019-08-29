@@ -27,8 +27,11 @@ module.exports = {
         await this.floors.push(floor)
       }
       if (this.state === direction === elevatorStates.goingUp) { // if elevetor's going up and person wants to go up
-        if (isBetween(this.floors[0], this.floors[1], floor)) {   // and if new floor is between current and target (e.x from 1 to 5 and button pressed at 3 ^)
+        if (isBetween(this.floors[0], this.floors[1], floor)) { // and if new floor is between current and target (e.x from 1 to 5 and button pressed at 3 ^)
           await this.floors.splice(1, 0, floor) // pushing new flor bettwen current and target marking new floor as new target
+        }
+        if ((floor > this.floors[this.floors.length - 1]) || (floor < this.floors[0])) { // if new floor as higher than last in queue or lower than first
+          this.floors.push(floor) // push it to the top (making last in queue)
         }
       }
     }
