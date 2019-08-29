@@ -19,9 +19,14 @@ module.exports = {
 
     addFloor (floor, direction) {
       if (this.floor.includes(floor)) {
-        return 
+        return
       }
-      
+      if (this.state === elevatorStates.still) {
+        this.floors.push(floor)
+      }
+      if (this.state === direction === elevatorStates.goingUp) {  // if elevetor's going up and person wants to go up
+        this.floors.push(floor)  // simply add as a last element
+      }
     }
   }
 }
