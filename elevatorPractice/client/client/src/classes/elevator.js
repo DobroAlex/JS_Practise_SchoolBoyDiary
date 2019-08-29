@@ -18,6 +18,10 @@ class Elevator {
     this.state = state
   }
 
+  async removeCurrentFloor () { // is ought to be called then elevator arrives at floor
+    await this.floors[0].shift()
+  }
+
   async addFloor (floor, direction) {
     if (this.floor.includes(floor)) { // it's pointless to add floor if queue contains one
       return
