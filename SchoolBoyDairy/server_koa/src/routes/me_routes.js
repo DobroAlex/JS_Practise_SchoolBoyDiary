@@ -62,7 +62,6 @@ router.put('/me', async (context) => { // rout is used to save user after modifi
   let requestBody = context.request.body
 
   foundUser.fullName = requestBody.fullName
-  foundUser.description = requestBody.description
   foundUser.school = requestBody.school
   foundUser.class = requestBody.class
   foundUser.email = requestBody.email

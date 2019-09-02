@@ -22,10 +22,6 @@ module.exports = Object.freeze({
         type: 'string',
         minLength: 1
       },
-      description: {
-        type: 'string',
-        minLength: 1
-      },
       school: {
         type: 'string',
         minLength: 1
@@ -47,7 +43,7 @@ module.exports = Object.freeze({
         pattern: 'admin|user'
       }
     },
-    required: ['fullName', 'description', 'school', 'class', 'email', 'phoneNumber', 'role']
+    required: ['fullName', 'school', 'class', 'email', 'phoneNumber', 'role']
   },
   DELETE_USERS_EMAIL_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
     id: 'DELETE_USERS_EMAIL_SCHEMA',

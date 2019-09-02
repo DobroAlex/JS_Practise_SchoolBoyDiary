@@ -147,13 +147,13 @@ export default {
                 await checkTokensAndRefrsh(sessionStorage, this.$router)  
 
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
-                this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'), this.role)
+                this.schoolClass, this.phoneNumber, sessionStorage.getItem('token'), this.role)
 
                 this.isUpdated = true
 
                 this.isEditing = false
 
-                this.getMe()
+                await this.getMe()
 
             }
             catch(e) {
