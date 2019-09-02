@@ -47,7 +47,7 @@ router.get('/me', async (context) => {
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
 
-  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber role')
+  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber role lessons homeTasks')
 
   context.ok(foundUser)
 })
@@ -58,8 +58,9 @@ router.put('/me', async (context) => {
 
   await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body) // validating request body
 
-  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber')
+  const foundUser = await User.findOne({ email: decoded.email }, '')
   let requestBody = context.request.body
+
   foundUser.fullName = requestBody.fullName
   foundUser.description = requestBody.description
   foundUser.school = requestBody.school

@@ -32,13 +32,6 @@ app.use(async function handleError (context, next) {
   }
 })
 
-/* app.use(jwt({
-  secret: jwtUtils.JWT_SECRET
-}).unless({
-  path: [/^\/public/, '/']
-}))
-*/
-
 app.use(async (ctx, next) => {
   const start = Date.now()
   await next()

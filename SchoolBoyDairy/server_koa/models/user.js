@@ -15,7 +15,7 @@ const UserSchmea = new Schema({
     date: Date,
     state: String
   }],
-  homeTask: [{ // home task in format of date, task aka simple string and state aka 'done', 'missed' or 'done partialy'
+  homeTasks: [{ // home task in format of date, task aka simple string and state aka 'done', 'missed' or 'done partialy'
     date: Date,
     task: String,
     state: String
