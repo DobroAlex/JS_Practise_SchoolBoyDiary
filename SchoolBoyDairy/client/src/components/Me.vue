@@ -64,7 +64,7 @@
             <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
             
             <hr>
-            <button type="button" :disabled="role!=='admin'" v-on:click='pushToAdmin'> Admin entrance </button>
+            <button type="button" :disabled="!this.checkAdminRole" v-on:click='pushToAdmin'> Admin entrance </button>
         </div>
     </div>
 </template>
@@ -103,6 +103,9 @@ export default {
     },
 
     methods: {
+        checkAdminRole: function(role) {
+            return role === 'admin'
+        },
 
         getMe: async function() {
             this.isLoading = true
