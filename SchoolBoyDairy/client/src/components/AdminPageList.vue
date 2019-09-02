@@ -22,6 +22,30 @@
                     <textarea v-model="description" ></textarea>
                 </p>
 
+                <table>
+                    <tr>
+                        <td> Date </td>
+                        <td> State </td>
+                    </tr>
+                    <tr v-for="lesson in currentlyEditingUser.lessons">
+                        <td> {{lesson.date}} </td>
+                        <td> {{lesson.state}} </td>
+                    </tr>
+                </table>
+
+                <hr>
+                <table>
+                    <tr>
+                        <td> Date </td>
+                        <td> Task </td>
+                        <td> State </td>
+                    </tr>
+                    <tr v-for="task in currentlyEditingUser.homeTasks">
+                        <td> {{task.date}} </td>
+                        <td> {{task.task}} </td>
+                        <td> {{task.state}} </td>
+                    </tr>
+                </table>
                 <p>
                     <label>Role</label>
                     <br>
@@ -29,6 +53,8 @@
                     <br>
                     <input type="radio" name="role" value="user" id="radioUser">User
                 </p>
+
+                
                 <hr>
                 <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
                 <button type="button" v-on:click="saveButtonClicked">Save</button>
@@ -85,6 +111,7 @@ export default {
     data() {
         return{
             users: [],
+            currentlyEditingUser: undefined,
             fullName: '',
             email: '',
             school: '',
@@ -163,6 +190,8 @@ export default {
             this.schoolClass = user.class
             this.phoneNumber = user.phoneNumber
             this.description = user.description
+
+            this.currentlyEditingUser = user
         },
         saveButtonClicked: async function() {
             await this.modifyUser()
