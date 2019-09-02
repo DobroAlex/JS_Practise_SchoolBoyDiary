@@ -10,7 +10,16 @@ const UserSchmea = new Schema({
   email: String,
   password: String, // should be stored like bcrypt.hash(plainTextPassword, utils.HashRound). DON'T save plaintext
   role: String, // either user or admin
-  refreshToken: String
+  refreshToken: String,
+  lessons: [{ // lesson date and state aka 'visited', 'missed', 'unpaid'
+    date: Date,
+    state: String
+  }],
+  homeTask: [{ // home task in format of date, task aka simple string and state aka 'done', 'missed' or 'done partialy'
+    date: Date,
+    task: String,
+    state: String
+  }]
 })
 
 const User = mongoose.model('User', UserSchmea)
