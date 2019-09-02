@@ -24,10 +24,37 @@
                     <label>Description</label>
                     <textarea v-model="description" :readonly="true"></textarea>
                 </p>
+
+                <hr>
+
+                <table>
+                    <tr>
+                        <td> Date </td>
+                        <td> State </td>
+                    </tr>
+                    <tr v-for="lesson in lessons">
+                        <td> {{lesson.date}} </td>
+                        <td> {{lesson.state}} </td>
+                    </tr>
+                </table>
+
+                <hr>
+                <table>
+                    <tr>
+                        <td> Date </td>
+                        <td> Task </td>
+                        <td> State </td>
+                    </tr>
+                    <tr v-for="task in homeTasks">
+                        <td> {{task.date}} </td>
+                        <td> {{task.task}} </td>
+                        <td> {{task.state}} </td>
+                    </tr>
+                </table>
                 <hr>
                 <button type="button" :disabled="isEditing" v-on:click="editButtonClicked">Edit me</button>
                 <p>
-                    <button type="button" :disabled="!isEditing"   v-on:click="saveButtonClicked">Save</button>
+                    <button type="button" :disabled="!isEditing" v-on:click="saveButtonClicked">Save</button>
                     <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
                 </p>
                 <p v-if="isUpdated">Updated successfully</p>
@@ -35,6 +62,9 @@
 
             <hr>
             <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
+            
+            <hr>
+            <button type="button" :disabled="role!=='admin'" v-on:click='pushToAdmin'> Admin entrance </button>
         </div>
     </div>
 </template>
@@ -57,6 +87,8 @@ export default {
             phoneNumber: '',
             description: '',
             role: '',
+            lessons: [],
+            homeTasks: [],
             isEditing: false,
             isUpdated: false,
             isLoading: true
@@ -85,6 +117,8 @@ export default {
                 this.schoolClass = response.class
                 this.phoneNumber = response.phoneNumber
                 this.description = response.description
+                this.lessons = response.lessons
+                this.homeTasks = response.homeTasks
                 this.role = response.role
                 this.isLoading = false
             }
@@ -107,12 +141,11 @@ export default {
                 this.schoolClass = 'university'
             }
             try {
-                alert(1)
-                await checkTokensAndRefrsh(sessionStorage, this.$router)    
-                alert(2)
+                await checkTokensAndRefrsh(sessionStorage, this.$router)  
+
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
                 this.schoolClass, this.phoneNumber, this.description, sessionStorage.getItem('token'), this.role)
-alert(3)
+
                 this.isUpdated = true
 
                 this.isEditing = false
@@ -155,6 +188,9 @@ alert(3)
                     alert('Your real email and given input mismatch')
                 }
             
+        },
+        pushToAdmin() {
+            this.$router.push({name:'AdminPageList'})
         }
         
     },
