@@ -42,7 +42,7 @@ router.post('/me/refresh', async (context) => {
   })
 })
 
-router.get('/me', async (context) => {
+router.get('/me', async (context) => { // rout is used to get user
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
@@ -52,7 +52,7 @@ router.get('/me', async (context) => {
   context.ok(foundUser)
 })
 
-router.put('/me', async (context) => {
+router.put('/me', async (context) => { // rout is used to save user after modification on front-end
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
   await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) // validating token
 
