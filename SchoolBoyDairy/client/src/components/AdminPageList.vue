@@ -9,14 +9,14 @@
             <div class="addLessonHead">Add new lesson</div>
             <div class="addLessonBody">
                 <label> Select Data </label>
-                <date-picker v-model="value1" valueType="format" lang="en" ></date-picker>
+                <input type="date" v-model="newLessonDay" id="newLessonDayPicker">
                 <label> Select State </label>
                 <select required="true" id='newLessonStateSelector'>
                     <option value="visited">visited (and paid)</option>
                     <option value="missed">missed</option>
                     <option value="unpaid">unpaid (but visited)</option>
                 </select>
-                <button type="button" v-on:click="this.saveLesson(this.newLessonDay, this.getNewLessonState() )">Save</button>
+                <button type="button" v-on:click="saveLesson(newLessonDay, getNewLessonState() )">Save</button>
             </div>
         </modal>
 
