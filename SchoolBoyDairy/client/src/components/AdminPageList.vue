@@ -105,6 +105,7 @@
 import UsersService from '../services/UsersService'
 import { checkTokensAndRefrsh } from '../sharedMethods/sharedMethods'
 import { async, all } from 'q'
+import { setTimeout } from 'timers';
 
 export default {
     'name': 'AdmiPageList',
@@ -118,6 +119,7 @@ export default {
             schoolClass: '',
             phoneNumber: '',
             description: '',
+            role: '',
             isModalDisplaying: false,
             submitStatus: 'OK'
         }
@@ -169,6 +171,7 @@ export default {
         },
         modifyUser: async function(){
             await checkTokensAndRefrsh(sessionStorage, this.$router)
+            this.role = this.getRole()
             this.submitStatus = 'PENDING'
             try {
                 const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
@@ -190,17 +193,37 @@ export default {
             this.schoolClass = user.class
             this.phoneNumber = user.phoneNumber
             this.description = user.description
+            this.role = user.role
 
             this.currentlyEditingUser = user
         },
         saveButtonClicked: async function() {
+            await checkTokensAndRefrsh(sessionStorage, this.$router)
+
             await this.modifyUser()
             await this.getUsers()
+
             this.isModalDisplaying = false
         },
         cancelEditButtonClicked: async function() {
             this.isModalDisplaying = false
             await this.getUsers()
+        },
+        setRole: function() {
+            if (this.role === 'admin' ) {
+                document.getElementById('radioAdmin').checked = true
+            }
+            else {
+                document.getElementById('radioUser').checked = true
+            }
+        },
+        getRole: function() {
+            if (document.getElementById('radioAdmin').checked) {
+                return 'admin'
+            }
+            else {
+                return 'user'
+            }
         }
     },
 
