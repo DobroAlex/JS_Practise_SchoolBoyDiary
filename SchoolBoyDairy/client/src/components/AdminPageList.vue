@@ -1,5 +1,25 @@
 <template>
     <div class="defaultPageStyle">
+        <modal name="addLessonModal"
+            :classes="['v--modal']"
+            :pivot-y="0.2"
+            :width="240"
+            :height="240"
+            >
+            <div class="addLessonHead">Add new lesson</div>
+            <div class="addLessonBody">
+                <label> Select Data </label>
+                <date-picker v-model="value1" valueType="format" lang="en" ></date-picker>
+                <label> Select State </label>
+                <select required="true" id='newLessonStateSelector'>
+                    <option value="visited">visited (and paid)</option>
+                    <option value="missed">missed</option>
+                    <option value="unpaid">unpaid (but visited)</option>
+                </select>
+                <button type="button" v-on:click="this.saveLesson(this.newLessonDay, this.getNewLessonState() )">Save</button>
+            </div>
+        </modal>
+
         <div class="editModal" v-if="isModalDisplaying === true">
             <label>Full Name:</label>
                 <input required v-model="fullName">
@@ -23,6 +43,7 @@
                 </p>
 
                 <table>
+                    <button type="button" v-on:click="addLesson">Add lesson</button>
                     <tr>
                         <td> Date </td>
                         <td> State </td>
@@ -105,10 +126,13 @@
 import UsersService from '../services/UsersService'
 import { checkTokensAndRefrsh } from '../sharedMethods/sharedMethods'
 import { async, all } from 'q'
-import { setTimeout } from 'timers';
+import DatePicker from 'vue2-datepicker'
+import { registerModal, showModal, hideModal, getModalFromThis }  from '../sharedMethods/sharedModalMethods'
+
 
 export default {
     'name': 'AdmiPageList',
+    comments: { DatePicker },
     data() {
         return{
             users: [],
@@ -121,6 +145,7 @@ export default {
             description: '',
             role: '',
             isModalDisplaying: false,
+            newLessonDay: new Date(2000, 12, 31, 12, 0, 0),
             submitStatus: 'OK'
         }
 
@@ -178,7 +203,7 @@ export default {
                     this.schoolClass, this.phoneNumber, this.description, this.role)
             }
             catch(e) {
-                
+
             }
             finally {
                 this.submitStatus = 'OK'
@@ -224,10 +249,21 @@ export default {
             else {
                 return 'user'
             }
-        }
+        },
+        addLesson: function() {
+            showModal('addLessonModal')
+        },
+        getNewLessonState: function() {
+            const e = document.getElementById('newLessonStateSelector')
+            return e.options[e.selectedIndex].value
+        },
+        saveLesson: function(date, state) {
+            this.currentlyEditingUser.lessons.push({date: date, state: state})
+        },
     },
 
     async beforeMount() {
+        registerModal(getModalFromThis(this))
         try {
             await this.getUsers()
         }
