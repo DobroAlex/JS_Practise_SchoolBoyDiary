@@ -11,12 +11,12 @@
                 <label> Select Data </label>
                 <input type="datetime-local" v-model="newLessonDay" id="newLessonDayPicker">
                 <label> Select State </label>
-                <select required="true" id='newLessonStateSelector'>
+                <select required="true" id='newLessonStateSelector' v-model="newLessonState">
                     <option value="visited">visited (and paid)</option>
                     <option value="missed">missed</option>
                     <option value="unpaid">unpaid (but visited)</option>
                 </select>
-                <button type="button" v-on:click="saveLesson(newLessonDay, getNewLessonState() )">Save</button>
+                <button type="button" v-on:click="saveLesson(newLessonDay, newLessonState )">Save</button>
             </div>
         </modal>
 
@@ -70,9 +70,9 @@
                 <p>
                     <label>Role</label>
                     <br>
-                    <input type="radio" name="role" value="admin" id="radioAdmin">Admin
+                    <input type="radio" name="role" value="admin" id="radioAdmin" v-model="role">Admin
                     <br>
-                    <input type="radio" name="role" value="user" id="radioUser">User
+                    <input type="radio" name="role" value="user" id="radioUser" v-model="role">User
                 </p>
 
                 
@@ -146,6 +146,7 @@ export default {
             role: '',
             isModalDisplaying: false,
             newLessonDay: new Date(2000, 12, 31, 12, 0, 0),
+            newLessonState: 'visited',
             submitStatus: 'OK'
         }
 
@@ -196,7 +197,6 @@ export default {
         },
         modifyUser: async function(){
             await checkTokensAndRefrsh(sessionStorage, this.$router)
-            this.role = this.getRole()
             this.submitStatus = 'PENDING'
             try {
                 const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
@@ -234,28 +234,8 @@ export default {
             this.isModalDisplaying = false
             await this.getUsers()
         },
-        setRole: function() {
-            if (this.role === 'admin' ) {
-                document.getElementById('radioAdmin').checked = true
-            }
-            else {
-                document.getElementById('radioUser').checked = true
-            }
-        },
-        getRole: function() {
-            if (document.getElementById('radioAdmin').checked) {
-                return 'admin'
-            }
-            else {
-                return 'user'
-            }
-        },
         addLesson: function() {
             showModal('addLessonModal')
-        },
-        getNewLessonState: function() {
-            const e = document.getElementById('newLessonStateSelector')
-            return e.options[e.selectedIndex].value
         },
         saveLesson: function(date, state) {
             this.currentlyEditingUser.lessons.push({date: date, state: state})
