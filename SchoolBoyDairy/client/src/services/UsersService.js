@@ -40,9 +40,9 @@ export default {
         email:email
       }})
   },
-  putUser(token, email, fullName, school, _class, phoneNumber, description, lessons, role ) {
+  putUser(token, email, fullName, school, _class, phoneNumber, description, lessons, homeTasks, role ) {
       return Api().put('/admin/users', {email: email, fullName: fullName, school: school, class: _class, 
-        phoneNumber: phoneNumber, description: description, lessons: lessons, role:role}, {headers: {
+        phoneNumber: phoneNumber, description: description, lessons: lessons, homeTasks: homeTasks, role:role}, {headers: {
           authorization: 'Bearer ' + token
         }
         })
