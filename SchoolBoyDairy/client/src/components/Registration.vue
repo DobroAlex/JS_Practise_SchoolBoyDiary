@@ -31,7 +31,8 @@
                 <label>Password</label>
                 <input required v-model.lazy="password" type="password" placeholder="password">
                 <p class="error" v-if="!$v.password.required && password">Password required</p>
-                <p class="error" v-if="!$v.password.isValidPassword && password">Password must have at least 1 capital and one number</p>
+                <p class="error" v-if="!$v.password.isValidPassword && password">Password must have at least 1 capital 
+                    and one number and be at least 8 chars long</p>
                 
                 <p>
                 <label>Password once again</label>
