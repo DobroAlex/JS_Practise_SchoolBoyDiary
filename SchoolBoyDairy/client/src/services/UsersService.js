@@ -26,7 +26,7 @@ export default {
         })
   },
   deleteMe(token, targetID){
-      return Api().delete('/me', {id: targetID}, {headers:{authorization: 'Bearer ' + token}})
+      return Api().delete('/me', {data:{id: targetID}, headers:{authorization: 'Bearer ' + token}})
   },
 
   getUsers(token){
