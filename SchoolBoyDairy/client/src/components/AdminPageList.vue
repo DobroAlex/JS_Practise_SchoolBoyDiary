@@ -9,7 +9,7 @@
             <div class="addLessonHead">Add new lesson</div>
             <div class="addLessonBody">
                 <label> Select Data </label>
-                <input type="date" v-model="newLessonDay" id="newLessonDayPicker">
+                <input type="datetime-local" v-model="newLessonDay" id="newLessonDayPicker">
                 <label> Select State </label>
                 <select required="true" id='newLessonStateSelector'>
                     <option value="visited">visited (and paid)</option>
@@ -200,7 +200,7 @@ export default {
             this.submitStatus = 'PENDING'
             try {
                 const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
-                    this.schoolClass, this.phoneNumber, this.description, this.role)
+                    this.schoolClass, this.phoneNumber, this.description, this.currentlyEditingUser.lessons, this.role)
             }
             catch(e) {
 
