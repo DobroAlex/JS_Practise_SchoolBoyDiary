@@ -9,14 +9,35 @@
             <div class="addLessonHead">Add new lesson</div>
             <div class="addLessonBody">
                 <label> Select Data </label>
-                <input type="datetime-local" v-model="newLessonDay" id="newLessonDayPicker">
+                <input type="datetime-local" v-model="newDay">
                 <label> Select State </label>
-                <select required="true" id='newLessonStateSelector' v-model="newLessonState">
+                <select required="true"  v-model="newState">
                     <option value="visited">visited (and paid)</option>
                     <option value="missed">missed</option>
                     <option value="unpaid">unpaid (but visited)</option>
                 </select>
-                <button type="button" v-on:click="saveLesson(newLessonDay, newLessonState )">Save</button>
+                <button type="button" v-on:click="saveLesson(newDay, newState )">Save</button>
+            </div>
+        </modal>
+
+        <modal name="addHomeTaskModal"
+            :classes="['v--modal']"
+            :pivot-y="0.2"
+            :width="240"
+            :height="240"
+            >
+            <div class="addHomeTaskHead">Add new Home Task</div>
+            <div class="addHomeTaskBody">
+                <label> Select Data </label>
+                <input type="datetime-local" v-model="newDay">
+                <label> Select State </label>
+                <select required="true"  v-model="newState">
+                    <option value="done">done 100%</option>
+                    <option value="missed">missed</option>
+                    <option value="partialy">done partialy</option>
+                </select>
+                <textarea v-model="newDescription">New home task description</textarea>
+                <button type="button" v-on:click="saveHomeTask(newDay, newState, newDescription )">Save</button>
             </div>
         </modal>
 
@@ -56,6 +77,7 @@
 
                 <hr>
                 <table>
+                    <button type="button" v-on:click="addHomeTask">Add Home Task</button>
                     <tr>
                         <td> Date </td>
                         <td> Task </td>
@@ -145,8 +167,9 @@ export default {
             description: '',
             role: '',
             isModalDisplaying: false,
-            newLessonDay: new Date(2000, 12, 31, 12, 0, 0),
-            newLessonState: 'visited',
+            newDay: Date.now(),
+            newState: 'visited',
+            newDescription: '',
             submitStatus: 'OK'
         }
 
@@ -200,7 +223,8 @@ export default {
             this.submitStatus = 'PENDING'
             try {
                 const response = await UsersService.putUser(sessionStorage.getItem('token'), this.email, this.fullName, this.school, 
-                    this.schoolClass, this.phoneNumber, this.description, this.currentlyEditingUser.lessons, this.role)
+                    this.schoolClass, this.phoneNumber, this.description, this.currentlyEditingUser.lessons, this.currentlyEditingUser.homeTasks,
+                    this.role)
             }
             catch(e) {
 
@@ -237,9 +261,15 @@ export default {
         addLesson: function() {
             showModal('addLessonModal')
         },
+        addHomeTask: function() {
+            showModal('addHomeTaskModal')
+        },
         saveLesson: function(date, state) {
             this.currentlyEditingUser.lessons.push({date: date, state: state})
         },
+        saveHomeTask: function(date, state, description) {
+            this.currentlyEditingUser.homeTasks.push({date: date, state: state, description: description})
+        }
     },
 
     async beforeMount() {
