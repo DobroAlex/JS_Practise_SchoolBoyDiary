@@ -11,7 +11,7 @@ export default {
   },
   getMe (token) {
       return Api().get('/me', {headers: {
-        authorization: 'Bearer ' + token
+        authorization: `Bearer ${token}`
       }
       })
   },
@@ -21,16 +21,16 @@ export default {
   putMe(email, fullName, school, _class, phoneNumber, description, token, role){
       return Api().put('/me', {email: email, fullName: fullName, school: school, class: _class, 
         phoneNumber: phoneNumber, description: description, role: role}, {headers: {
-          authorization: 'Bearer ' + token
+          authorization: `Bearer ${token}`
         }
         })
   },
   deleteMe(token, targetID){
-      return Api().delete('/me', {data:{id: targetID}, headers:{authorization: 'Bearer ' + token}})
+      return Api().delete('/me', {data:{id: targetID}, headers:{authorization: `Bearer  ${token}`}})
   },
 
   getUsers(token){
-      return Api().get('/admin/users', {headers:{authorization: 'Bearer ' + token}})
+      return Api().get('/admin/users', {headers:{authorization: `Bearer ${token}`}})
   },
   deleteUser(token, email){
       return Api().delete('/admin/users', {headers: { // https://stackoverflow.com/questions/43573297/put-request-with-simple-string-as-request-body
@@ -43,7 +43,7 @@ export default {
   putUser(token, email, fullName, school, _class, phoneNumber, description, lessons, homeTasks, role ) {
       return Api().put('/admin/users', {email: email, fullName: fullName, school: school, class: _class, 
         phoneNumber: phoneNumber, description: description, lessons: lessons, homeTasks: homeTasks, role:role}, {headers: {
-          authorization: 'Bearer ' + token
+          authorization: `Bearer ${token}`
         }
         })
   },
