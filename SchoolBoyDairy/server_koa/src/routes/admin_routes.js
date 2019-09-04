@@ -65,6 +65,7 @@ router.put('/admin/users/', async (context) => {
   foundUser.phoneNumber = requestBody.phoneNumber
   foundUser.role = requestBody.role // admin may change any user role
   foundUser.lessons = requestBody.lessons
+  foundUser.homeTasks = requestBody.homeTasks
 
   await foundUser.save()
 
