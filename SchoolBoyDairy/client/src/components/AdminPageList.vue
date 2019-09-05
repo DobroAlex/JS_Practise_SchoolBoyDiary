@@ -16,7 +16,8 @@
                     <option value="missed">missed</option>
                     <option value="unpaid">unpaid (but visited)</option>
                 </select>
-                <button type="button" v-on:click="saveLesson(newDay, newState )">Save</button>
+                <button type="button" @click="saveLesson(newDay, newState)">Save</button>
+                <button type="button" @click="closeMeModal('addLessonModal')">Close</button>
             </div>
         </modal>
 
@@ -29,14 +30,15 @@
             <div class="editLessonHead">Edit lesson</div>
             <div class="editLessonBody">
                 <label> Select Data </label>
-                <input type="datetime-local" v-model="currentlyEditingLesson.date">
+                <input type="datetime-local" v-model="currentlyEditingLesson.date.toString" >
                 <label> Select State </label>
                 <select required="true"  v-model="currentlyEditingLesson.state">
                     <option value="visited">visited (and paid)</option>
                     <option value="missed">missed</option>
                     <option value="unpaid">unpaid (but visited)</option>
                 </select>
-                <button type="button" v-on:click="saveEditedLesson(currentlyEditingLesson.id, currentlyEditingLesson)">Save</button>
+                <button type="button" @click="saveEditedLesson(currentlyEditingLesson.id, currentlyEditingLesson)">Save</button>
+                <button type="button" @click="closeMeModal('editLessonModal')">Close</button>
             </div>
         </modal>
 
@@ -58,7 +60,8 @@
                     <option value="partialy">done partialy</option>
                 </select>
                 <textarea v-model="newDescription">New home task description</textarea>
-                <button type="button" v-on:click="saveHomeTask(newDay, newState, newDescription )">Save</button>
+                <button type="button" @click="saveHomeTask(newDay, newState, newDescription )">Save</button>
+                <button type="button" @click="closeMeModal('addHomeTaskModal')">Close</button>
             </div>
         </modal>
 
@@ -79,7 +82,8 @@
                     <option value="partialy">done partialy</option>
                 </select>
                 <textarea v-model="currentlyEditingHomeTask.description">New home task description</textarea>
-                <button type="button" v-on:click="saveEditedHomeTask(newDay, newState, newDescription )">Save</button>
+                <button type="button" @click="saveEditedHomeTask(newDay, newState, newDescription )">Save</button>
+                <button type="button" @click="closeMeModal('editHomeTaskModal')">Close</button>
             </div>
         </modal>
 
@@ -106,7 +110,7 @@
                 </p>
 
                 <table>
-                    <button type="button" v-on:click="addLesson">Add lesson</button>
+                    <button type="button" @click="addLesson">Add lesson</button>
                     <tr>
                         <td> Date </td>
                         <td> State </td>
@@ -120,7 +124,7 @@
 
                 <hr>
                 <table>
-                    <button type="button" v-on:click="addHomeTask">Add Home Task</button>
+                    <button type="button" @click="addHomeTask">Add Home Task</button>
                     <tr>
                         <td> Date </td>
                         <td> Task </td>
@@ -143,8 +147,8 @@
 
                 
                 <hr>
-                <button type="button"  v-on:click="cancelEditButtonClicked">Cancel</button>
-                <button type="button" v-on:click="saveButtonClicked">Save</button>
+                <button type="button"  @click="cancelEditButtonClicked">Cancel</button>
+                <button type="button" @click="saveButtonClicked">Save</button>
                 
                 <div class="loader" v-if="submitStatus === 'PENDING'"></div>
         </div>
@@ -173,8 +177,8 @@
                         <td> {{user.phoneNumber}} </td>
                         <td> {{user.role}} </td>
                         <p>
-                            <button type="submit" v-on:click="deleteButtonClicked(user.email)"> Delete </button>
-                            <button type="submit" v-on:click="editUserButtonClicked(user)"> Edit this </button>
+                            <button type="submit" @click="deleteButtonClicked(user.email)"> Delete </button>
+                            <button type="submit" @click="editUserButtonClicked(user)"> Edit this </button>
                         </p>
                         <div class="loader" v-if="submitStatus === 'DELETING'"></div>
                     </tr>
@@ -319,14 +323,14 @@ export default {
             showModal('editHomeTaskModal')
         },
         saveLesson: function(date, state) {
-            this.currentlyEditingUser.lessons.push({date: date, state: state, id: md5(Date.now().toString())})
+            this.currentlyEditingUser.lessons.push({date: date.toString(), state: state, id: md5(Date.now().toString())})
         },
         saveEditedLesson: function(id, lesson) {
             const index = this.findIndex(this.currentlyEditingUser.lessons, id)
             this.currentlyEditingUser.lessons[index] = lesson
         },
         saveHomeTask: function(date, state, description) {
-            this.currentlyEditingUser.homeTasks.push({date: date, state: state, description: description, id: md5(Date.now().toString())})
+            this.currentlyEditingUser.homeTasks.push({date: date.toString(), state: state, description: description, id: md5(Date.now().toString())})
         },
         saveEditedHomeTask: function(id, homeTask) {
             const index = this.findIndex(this.currentlyEditingUser.homeTasks, id)
@@ -340,6 +344,9 @@ export default {
                 }
             }
             return -1
+        },
+        closeMeModal: function(modalNme) {
+            hideModal(modalNme)
         }
     }, 
 
