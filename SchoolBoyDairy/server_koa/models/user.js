@@ -13,12 +13,14 @@ const UserSchmea = new Schema({
   refreshToken: String,
   lessons: [{ // lesson date and state aka 'visited', 'missed', 'unpaid'
     date: Date,
-    state: String
+    state: String,
+    id: String // md5 of Date.now()
   }],
   homeTasks: [{ // home task in format of date, task aka simple string and state aka 'done', 'missed' or 'partialy'
     date: Date,
     task: String,
-    state: String
+    state: String,
+    id: String // md5 of Date.now()
   }]
 })
 
