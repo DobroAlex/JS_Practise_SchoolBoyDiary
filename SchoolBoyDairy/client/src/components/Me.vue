@@ -66,7 +66,7 @@
             <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
             
             <hr>
-            <button type="button" :disabled="!this.checkAdminRole" v-on:click='pushToAdmin'> Admin entrance </button>
+            <button type="button" :disabled="!checkAdminRole" v-on:click='pushToAdmin'> Admin entrance </button>
         </div>
     </div>
 </template>
