@@ -1,9 +1,10 @@
 <template>
     <div class="defaulPtageStyle">
-        <div class="loader" v-if="isLoading === true"></div>
-        <div class="meForm" v-else>
+        <div class="loader" v-if="isLoading === true && isEditing === false"></div>
+        <div v-else>
+                            <h1>My page</h1>
+            <div class="meForm" v-if="isLoading === false && isEditing === true">
             <form class="meClass" @submit.prevent="saveButtonClicked">
-                <h1>My page</h1>
                 <label>Full Name:</label>
                 <input required v-model="fullName"  :readonly="!isEditing">
 
@@ -26,7 +27,23 @@
                 </p>
 
                 <hr>
-
+            </form>
+        </div>
+        <div v-else>
+            <label>Full Name: {{fullName}}</label>
+            <br>
+            <label>Email: {{email}}</label>
+            <br>
+            <label>School: {{school}}</label>
+            <br>
+            <label>Class: {{schoolClass}}</label>
+            <br>
+            <label>Phone Number: {{phoneNumber}}</label>
+            <br>
+            <label>Description</label>
+            <label>{{description}}</label>
+            <br>
+        </div>
                 <label>attendance {{attendance}} %</label>
 
                 <table>
@@ -60,7 +77,7 @@
                     <button type="button" :disabled="!isEditing" v-on:click="cancelButtonClicked">Cancel</button>
                 </p>
                 <p v-if="isUpdated">Updated successfully</p>
-            </form>
+           
 
             <hr>
             <button type="button" v-on:click='deleteButtonClicked'>Delete my page</button>
