@@ -27,6 +27,8 @@
 
                 <hr>
 
+                <label>attendance {{attendance}} %</label>
+
                 <table>
                     <tr>
                         <td> Date </td>
@@ -196,8 +198,20 @@ export default {
         pushToAdmin() {
             this.$router.push({name:'AdminPageList'})
         },
-        calculateVisited: function (lessons) {
-
+        calculateAttendacne: function () {
+            let visited = 0, missed = 0
+            for (lesson in this.lessons) {
+                if (lesson.state === 'missed') {
+                    missed++
+                }
+                else {
+                    visited++
+                }
+            }
+            if (missed === 0) { // avoiding division by zero
+                return 100
+            }
+            return visited/unvisited * 100
         }
         
     },
@@ -209,6 +223,9 @@ export default {
         catch(e) {
             this.$router.push({name: 'Login'})
         }
+    },
+    mounted() {
+        this.attendance = this.calculateAttendacne()
     }
     
 }
