@@ -20,6 +20,27 @@
             </div>
         </modal>
 
+        <modal name="editLessonModal"
+            :classes="['v--modal']"
+            :pivot-y="0.2"
+            :width="240"
+            :height="240"
+            >
+            <div class="editLessonHead">Edit lesson</div>
+            <div class="editLessonBody">
+                <label> Select Data </label>
+                <input type="datetime-local" v-model="currentlyEditingLesson.date">
+                <label> Select State </label>
+                <select required="true"  v-model="currentlyEditingLesson.state">
+                    <option value="visited">visited (and paid)</option>
+                    <option value="missed">missed</option>
+                    <option value="unpaid">unpaid (but visited)</option>
+                </select>
+                <button type="button" v-on:click="saveEditedLesson(currentlyEditingLesson.id, currentlyEditingLesson)">Save</button>
+            </div>
+        </modal>
+
+
         <modal name="addHomeTaskModal"
             :classes="['v--modal']"
             :pivot-y="0.2"
@@ -72,6 +93,7 @@
                     <tr v-for="lesson in currentlyEditingUser.lessons">
                         <td> {{lesson.date}} </td>
                         <td> {{lesson.state}} </td>
+                        <button type="button" @click="editLesson(lesson)">Edit</button>
                     </tr>
                 </table>
 
@@ -87,6 +109,7 @@
                         <td> {{task.date}} </td>
                         <td> {{task.task}} </td>
                         <td> {{task.state}} </td>
+                        <button type="button" @click="editHomeTask(task)">Edit</button>
                     </tr>
                 </table>
                 <p>
@@ -150,7 +173,7 @@ import { checkTokensAndRefrsh } from '../sharedMethods/sharedMethods'
 import { async, all } from 'q'
 import DatePicker from 'vue2-datepicker'
 import { registerModal, showModal, hideModal, getModalFromThis }  from '../sharedMethods/sharedModalMethods'
-
+const md5 = require('js-md5')
 
 export default {
     'name': 'AdmiPageList',
@@ -159,6 +182,8 @@ export default {
         return{
             users: [],
             currentlyEditingUser: undefined,
+            currentlyEditingLesson: {date: Date.now(), state: 'visited'},
+            currentlyEditingHomeTask: {date: Date.now(), state: 'done', description: '_'},
             fullName: '',
             email: '',
             school: '',
@@ -264,13 +289,34 @@ export default {
         addHomeTask: function() {
             showModal('addHomeTaskModal')
         },
+        editLesson: function(targetLesson) {
+            this.currentlyEditingLesson = targetLesson
+            showModal('editLessonModal')
+        },
+        editHomeTask: function(targetHomeTask) {
+            this.currentlyEditingHomeTask = targetHomeTask
+            showModal('editHomeTaskModal')
+        },
         saveLesson: function(date, state) {
-            this.currentlyEditingUser.lessons.push({date: date, state: state})
+            this.currentlyEditingUser.lessons.push({date: date, state: state, id: md5(Date.now().toString())})
+        },
+        saveEditedLesson: function(id, lesson) {
+            const index = this.findIndex(this.currentlyEditingUser.lessons, id)
+            this.currentlyEditingUser[index] = lesson
         },
         saveHomeTask: function(date, state, description) {
-            this.currentlyEditingUser.homeTasks.push({date: date, state: state, description: description})
+            this.currentlyEditingUser.homeTasks.push({date: date, state: state, description: description, id: md5(Date.now().toString())})
+        },
+        findIndex: function(arr, targetID) {
+            let i
+            for (i = 0; i < arr.length; i++) {
+                if (arr[i].id === targetID) {
+                    return i
+                }
+            }
+            return -1
         }
-    },
+    }, 
 
     async beforeMount() {
         registerModal(getModalFromThis(this))
