@@ -18,7 +18,7 @@ export default {
   refreshMe (token) {
       return Api().post('/me/refresh', {refreshToken: token})
   },
-  putMe(email, fullName, school, _class, phoneNumber, description, token, role){
+  putMe(email, fullName, school, _class, phoneNumber, description, role, token){
       return Api().put('/me', {email: email, fullName: fullName, school: school, class: _class, 
         phoneNumber: phoneNumber, description: description, role: role}, {headers: {
           authorization: `Bearer ${token}`

@@ -91,7 +91,8 @@ export default {
             homeTasks: [],
             isEditing: false,
             isUpdated: false,
-            isLoading: true
+            isLoading: true,
+            attendance: 0.0
         }
     },
 
@@ -147,7 +148,7 @@ export default {
                 await checkTokensAndRefrsh(sessionStorage, this.$router)  
 
                 const response = await UsersService.putMe(this.email.toLowerCase(), this.fullName, this.school, 
-                this.schoolClass, this.phoneNumber, sessionStorage.getItem('token'), this.role)
+                this.schoolClass, this.phoneNumber, this.description, this.role,  sessionStorage.getItem('token'))
 
                 this.isUpdated = true
 
@@ -158,7 +159,7 @@ export default {
             }
             catch(e) {
                 sessionStorage.clear()
-                this.$router.push({name: 'Login'})
+                //this.$router.push({name: 'Login'})
             }
         },
 
@@ -173,7 +174,7 @@ export default {
             const resp = prompt("This is very serious decision and this can't be undone. Are you sure? If yes, input your email once more")
             if (resp !== null && (resp.toLowerCase() === this.email)) {
                 try{
-                    checkTokensAndRefrsh(sessionStorage, this.$router)
+                    await checkTokensAndRefrsh(sessionStorage, this.$router)
 
                     await UsersService.deleteMe(sessionStorage.getItem('token'))
 
@@ -194,6 +195,9 @@ export default {
         },
         pushToAdmin() {
             this.$router.push({name:'AdminPageList'})
+        },
+        calculateVisited: function (lessons) {
+
         }
         
     },
