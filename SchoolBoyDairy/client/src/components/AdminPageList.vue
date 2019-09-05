@@ -62,6 +62,27 @@
             </div>
         </modal>
 
+        <modal name="editHomeTaskModal"
+            :classes="['v--modal']"
+            :pivot-y="0.2"
+            :width="240"
+            :height="240"
+            >
+            <div class="editHomeTaskHead">Edit Home Task</div>
+            <div class="editHomeTaskBody">
+                <label> Select Data </label>
+                <input type="datetime-local" v-model="currentlyEditingHomeTask.date">
+                <label> Select State </label>
+                <select required="true"  v-model="currentlyEditingHomeTask.state">
+                    <option value="done">done 100%</option>
+                    <option value="missed">missed</option>
+                    <option value="partialy">done partialy</option>
+                </select>
+                <textarea v-model="currentlyEditingHomeTask.description">New home task description</textarea>
+                <button type="button" v-on:click="saveEditedHomeTask(newDay, newState, newDescription )">Save</button>
+            </div>
+        </modal>
+
         <div class="editModal" v-if="isModalDisplaying === true">
             <label>Full Name:</label>
                 <input required v-model="fullName">
@@ -302,10 +323,14 @@ export default {
         },
         saveEditedLesson: function(id, lesson) {
             const index = this.findIndex(this.currentlyEditingUser.lessons, id)
-            this.currentlyEditingUser[index] = lesson
+            this.currentlyEditingUser.lessons[index] = lesson
         },
         saveHomeTask: function(date, state, description) {
             this.currentlyEditingUser.homeTasks.push({date: date, state: state, description: description, id: md5(Date.now().toString())})
+        },
+        saveEditedHomeTask: function(id, homeTask) {
+            const index = this.findIndex(this.currentlyEditingUser.homeTasks, id)
+            this.currentlyEditingUser.homeTasks[index] = homeTask
         },
         findIndex: function(arr, targetID) {
             let i
