@@ -43,7 +43,7 @@ app.use(adminRoutes.allowedMethods())
 const server = app.listen(8081 || process.env.PORT) // starting up server after initializing all app.uses
 console.log(`Server is listening to ${server.address().port} `)
 
-const mongoconnection = require('../mongoconnection') // connecting to mongo
-mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS, server)
+const mongo = require('../../database/mongoconnection')
+const mongoconnection = mongo.connectToMongo(server)
 
 module.exports = app
