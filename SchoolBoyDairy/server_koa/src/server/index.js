@@ -13,17 +13,8 @@ app.use(koaRespond())
 const logger = require('koa-morgan')
 app.use(logger('dev'))
 
-app.use(async function handleError (context, next) {
-  try {
-    await next()
-  } catch (error) {
-    console.error(`Error occured: \n ${error} \n ${error.stack}`)
-    if (error.status) {
-      context.status = error.status
-    }
-    context.send(context.status, `${error}`)
-  }
-})
+const erroHanlder = require('./error-handler')
+app.use(erroHanlder.errorHandlerMiddle)
 
 app.use(async (ctx, next) => {
   const start = Date.now()
@@ -39,20 +30,20 @@ app.use(async function (context, next) { // https://github.com/axios/axios/issue
   await next()
 })
 
-const publicRoutes = require('./routes/public')
+const publicRoutes = require('../routes/public')
 app.use(publicRoutes.routes())
 app.use(publicRoutes.allowedMethods())
-const meRoutes = require('./routes/me')
+const meRoutes = require('../routes/me')
 app.use(meRoutes.routes())
 app.use(meRoutes.allowedMethods())
-const adminRoutes = require('./routes/admin')
+const adminRoutes = require('../routes/admin')
 app.use(adminRoutes.routes())
 app.use(adminRoutes.allowedMethods())
 
 const server = app.listen(8081 || process.env.PORT) // starting up server after initializing all app.uses
 console.log(`Server is listening to ${server.address().port} `)
 
-const mongoconnection = require('./mongoconnection') // connecting to mongo
+const mongoconnection = require('../mongoconnection') // connecting to mongo
 mongoconnection.connectToMongo(mongoconnection.MONGO_USERS_ADDRESS, server)
 
 module.exports = app
