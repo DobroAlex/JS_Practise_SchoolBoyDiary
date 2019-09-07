@@ -124,4 +124,3 @@ module.exports = Object.freeze({
     required: ['email', 'role']
   }
 })
-

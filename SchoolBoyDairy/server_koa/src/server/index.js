@@ -44,6 +44,6 @@ const server = app.listen(8081 || process.env.PORT) // starting up server after 
 console.log(`Server is listening to ${server.address().port} `)
 
 const mongo = require('../../database/mongoconnection')
-const mongoconnection = mongo.connectToMongo(server)
+mongo.connectToMongo(server)
 
 module.exports = app
