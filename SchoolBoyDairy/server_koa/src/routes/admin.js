@@ -3,6 +3,7 @@ const validator = require('../libs/validator')
 const User = require('../models/user')
 const jwtUtils = require('../jwt-utils')
 const ajvUtils = require('../libs/ajv')
+const _ = require('lodash')
 const router = new Router()
 
 router.get('/admin/users', async (context) => {
@@ -54,17 +55,9 @@ router.put('/admin/users/', async (context) => {
 
   await validator.validate(ajvUtils.PUT_ME_SCHEMA, requestBody)
 
-  const foundUser = await User.findOne({ email: requestBody.email }, '')
+  let foundUser = await User.findOne({ email: requestBody.email }, '')
 
-  foundUser.fullName = requestBody.fullName
-  foundUser.description = requestBody.description
-  foundUser.school = requestBody.school
-  foundUser.class = requestBody.class
-  foundUser.phoneNumber = requestBody.phoneNumber
-  foundUser.role = requestBody.role // admin may change any user role
-  foundUser.lessons = requestBody.lessons
-  foundUser.homeTasks = requestBody.homeTasks
-
+  foundUser = _.assign(foundUser, requestBody)
   await foundUser.save()
 
   context.ok({

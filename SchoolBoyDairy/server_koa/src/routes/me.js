@@ -4,6 +4,7 @@ const ajvUtils = require('../libs/ajv')
 const User = require('../models/user')
 const utils = require('../libs/utils')
 const jwtUtils = require('../jwt-utils')
+const _ = require('lodash')
 const router = new Router()
 
 router.post('/me/checkToken', async (context) => {
@@ -57,15 +58,9 @@ router.put('/me', async (context) => { // rout is used to save user after modifi
 
   await validator.validate(ajvUtils.PUT_ME_SCHEMA, context.request.body) // validating request body
 
-  const foundUser = await User.findOne({ email: decoded.email }, '')
-  let requestBody = context.request.body
+  let foundUser = await User.findOne({ email: decoded.email }, '')
 
-  foundUser.fullName = requestBody.fullName
-  foundUser.school = requestBody.school
-  foundUser.class = requestBody.class
-  foundUser.email = requestBody.email
-  foundUser.phoneNumber = requestBody.phoneNumber
-
+  foundUser = _.assign(foundUser, context.request.body)
   await foundUser.save()
 
   context.ok({
