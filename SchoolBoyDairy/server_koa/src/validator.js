@@ -1,7 +1,7 @@
 const utils = require('./utils')
-
+const ajvUtils = require('./libs/ajv')
 module.exports = {
-  validate: async function (ajvInstance, schema, data) {
+  validate: async function (schema, data, ajvInstance = ajvUtils.ajvInstance) {
     if (ajvInstance.validate(schema, data)) {
       return true
     }
@@ -11,7 +11,7 @@ module.exports = {
 
   validateID: async function (Model, id) {
     if (id == null) {
-      throw utils.errorGenerator(`ID ${id} is undefined. probably wasn\'t created OR already deleted`, 404)
+      throw utils.errorGenerator(`ID ${id} is undefined. probably wasn't created OR already deleted`, 404)
     }
     try {
       const res = !!await Model.findById(id)

@@ -1,14 +1,12 @@
 const Router = require('koa-router')
 const validator = require('../validator')
-const ajv = require('../ajv-init')
-const ajvSchems = require('../ajv-schems')
 const User = require('../models/user')
 const jwtUtils = require('../jwt-utils')
-
+const ajvUtils = require('../libs/ajv')
 const router = new Router()
 
 router.get('/admin/users', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context)
 
   const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
 
@@ -16,9 +14,9 @@ router.get('/admin/users', async (context) => {
 })
 
 router.post('/admin/users', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context)
 
-  await validator.validate(ajv, ajvSchems.POST_USER_SCHEMA, context.request.body)
+  await validator.validate(ajvUtils.POST_USER_SCHEMA, context.request.body)
 
   let requestBody = context.request.body
   let newUser = new User({
@@ -38,7 +36,7 @@ router.post('/admin/users', async (context) => {
 })
 
 router.get('/admin/users/:id', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context)
 
   await validator.validateID(User, context.params.id, context)
 
@@ -50,11 +48,11 @@ router.get('/admin/users/:id', async (context) => {
 router.put('/admin/users/', async (context) => {
   const requestBody = context.request.body
 
-  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context)
 
   await validator.validateEmail(User, requestBody.email) // ensuring that given user exists
 
-  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, requestBody)
+  await validator.validate(ajvUtils.PUT_ME_SCHEMA, requestBody)
 
   const foundUser = await User.findOne({ email: requestBody.email }, '')
 
@@ -75,9 +73,9 @@ router.put('/admin/users/', async (context) => {
 })
 
 router.delete('/admin/users', async (context) => { // admin wants to delete user
-  await jwtUtils.validateAdminRoleAndToken(context, ajv)
+  await jwtUtils.validateAdminRoleAndToken(context)
 
-  await validator.validate(ajv, ajvSchems.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
+  await validator.validate(ajvUtils.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
 
   const targetEmail = context.request.body.email
 

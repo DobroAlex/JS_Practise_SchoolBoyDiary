@@ -1,15 +1,14 @@
 const Router = require('koa-router')
 const validator = require('../validator')
 const bcrypt = require('bcrypt')
-const ajv = require('../ajv-init')
-const ajvSchems = require('../ajv-schems')
+const ajvUtils = require('../libs/ajv')
 const User = require('../models/user')
 const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
 const router = new Router()
 
 router.post('/public/register', async (context) => {
-  await validator.validate(ajv, ajvSchems.REGISTER_USER_SCHEMA, context.request.body)
+  await validator.validate(ajvUtils.REGISTER_USER_SCHEMA, context.request.body)
 
   const hashedPass = await bcrypt.hash(context.request.body.password, utils.HASH_ROUNDS)
 

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const ajvSchems = require('./ajv-schems')
+const ajvUtils = require('./libs/ajv')
 const validator = require('./validator')
 const utils = require('./utils')
 
@@ -36,10 +36,10 @@ module.exports = {
     return (decoded && (decoded.role === 'admin'))
   },
 
-  validateAdminRoleAndToken: async function (context, ajv) { // Probably not the best practice in terms of OOP
+  validateAdminRoleAndToken: async function (context, ajv = ajvUtils.ajvInstance) { // Probably not the best practice in terms of OOP
     const decoded = this.verifyAccessToken(this.getTokenFromHeader(context))
 
-    if (!await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
+    if (!await validator.validate(ajv, ajvUtils.JWT_TOKEN_SCHEMA, decoded) || !this.isValidAdminRole(this.getTokenFromHeader(context))) {
       throw utils.errorGenerator(`Attempt to reach admin page while not being one for ${this.verifyAccessToken(this.getTokenFromHeader(context)).email}`, 403)
     }
     return decoded

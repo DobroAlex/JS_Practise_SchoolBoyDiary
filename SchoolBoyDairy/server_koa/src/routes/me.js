@@ -1,7 +1,6 @@
 const Router = require('koa-router')
 const validator = require('../validator')
-const ajv = require('../ajv-init')
-const ajvSchems = require('../ajv-schems')
+const ajvUtils = require('../libs/ajv')
 const User = require('../models/user')
 const utils = require('../utils')
 const jwtUtils = require('../jwt-utils')
@@ -45,7 +44,7 @@ router.post('/me/refresh', async (context) => {
 router.get('/me', async (context) => { // rout is used to get user
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
 
-  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded)
+  await validator.validate(ajvUtils.JWT_TOKEN_SCHEMA, decoded)
 
   const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber role lessons homeTasks')
 
@@ -54,9 +53,9 @@ router.get('/me', async (context) => { // rout is used to get user
 
 router.put('/me', async (context) => { // rout is used to save user after modification on front-end
   const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajv, ajvSchems.JWT_TOKEN_SCHEMA, decoded) // validating token
+  await validator.validate(ajvUtils.JWT_TOKEN_SCHEMA, decoded) // validating token
 
-  await validator.validate(ajv, ajvSchems.PUT_ME_SCHEMA, context.request.body) // validating request body
+  await validator.validate(ajvUtils.PUT_ME_SCHEMA, context.request.body) // validating request body
 
   const foundUser = await User.findOne({ email: decoded.email }, '')
   let requestBody = context.request.body
