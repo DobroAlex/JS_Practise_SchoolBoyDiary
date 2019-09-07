@@ -11,6 +11,7 @@ async function getUsers (context, next) {
 
   context.ok({ users: foundUsers })
 }
+
 async function putUser (context, next) {
   const requestBody = context.request.body
 
@@ -29,6 +30,7 @@ async function putUser (context, next) {
     message: `User ${requestBody.fullName}: ${requestBody.email} updated`
   })
 }
+
 async function deleteUser (context, next) {
   await jwtUtils.validateAdminRoleAndToken(context)
 
@@ -44,6 +46,7 @@ async function deleteUser (context, next) {
     message: `User ${foundUser.fullName}: ${foundUser.emit} deleted`
   })
 }
+
 async function postUser (context, next) {
   await jwtUtils.validateAdminRoleAndToken(context)
 
