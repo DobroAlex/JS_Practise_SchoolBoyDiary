@@ -1,4 +1,7 @@
+const Ajv = require('ajv')
+const ajvInstance = new Ajv({ allErrors: true })
 module.exports = Object.freeze({
+  ajvInstance, // constant instance of validator
   GET_ME_SCHEMA: { /* https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id */
     id: 'GET_ME_SCHEMA',
     type: 'object',
@@ -121,3 +124,4 @@ module.exports = Object.freeze({
     required: ['email', 'role']
   }
 })
+
