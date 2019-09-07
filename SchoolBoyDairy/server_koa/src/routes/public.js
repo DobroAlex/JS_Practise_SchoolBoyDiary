@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 const ajvUtils = require('../libs/ajv')
 const User = require('../models/user')
 const utils = require('../libs/utils')
-const jwtUtils = require('../jwt-utils')
+const jwtUtils = require('../libs/jwt-utils')
 const router = new Router()
 
 router.post('/public/register', async (context) => {

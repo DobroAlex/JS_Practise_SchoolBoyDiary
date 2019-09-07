@@ -1,7 +1,7 @@
 const Router = require('koa-router')
 const validator = require('../libs/validator')
 const User = require('../models/user')
-const jwtUtils = require('../jwt-utils')
+const jwtUtils = require('../libs/jwt-utils')
 const ajvUtils = require('../libs/ajv')
 const _ = require('lodash')
 const router = new Router()
