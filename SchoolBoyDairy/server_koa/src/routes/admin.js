@@ -1,84 +1,13 @@
+const middlewares = require('../middlewares/admin')
 const Router = require('koa-router')
-const validator = require('../libs/validator')
-const User = require('../models/user')
-const jwtUtils = require('../libs/jwt-utils')
-const ajvUtils = require('../libs/ajv')
-const _ = require('lodash')
 const router = new Router()
 
-router.get('/admin/users', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context)
+router.get('/admin/users', middlewares.getUsers)
 
-  const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
+router.post('/admin/users', middlewares.postUser)
 
-  context.ok({ users: foundUsers })
-})
+router.put('/admin/users/', middlewares.putUser)
 
-router.post('/admin/users', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context)
-
-  await validator.validate(ajvUtils.POST_USER_SCHEMA, context.request.body)
-
-  let requestBody = context.request.body
-  let newUser = new User({
-    fullName: requestBody.fullName,
-    description: requestBody.description,
-    school: requestBody.school,
-    class: requestBody.class,
-    email: requestBody.email,
-    role: requestBody.role, // admins may create other admins
-    phoneNumber: requestBody.phoneNumber
-  })
-
-  await newUser.save()
-  context.send(201, {
-    message: `User ${requestBody.fullName}: ${requestBody.email} saved)`
-  })
-})
-
-router.get('/admin/users/:id', async (context) => {
-  await jwtUtils.validateAdminRoleAndToken(context)
-
-  await validator.validateID(User, context.params.id, context)
-
-  const foundUser = await User.findById(context.params.id, '')
-
-  context.ok({ user: foundUser })
-})
-
-router.put('/admin/users/', async (context) => {
-  const requestBody = context.request.body
-
-  await jwtUtils.validateAdminRoleAndToken(context)
-
-  await validator.validateEmail(User, requestBody.email) // ensuring that given user exists
-
-  await validator.validate(ajvUtils.PUT_ME_SCHEMA, requestBody)
-
-  let foundUser = await User.findOne({ email: requestBody.email }, '')
-
-  foundUser = _.assign(foundUser, requestBody)
-  await foundUser.save()
-
-  context.ok({
-    message: `User ${requestBody.fullName}: ${requestBody.email} updated`
-  })
-})
-
-router.delete('/admin/users', async (context) => { // admin wants to delete user
-  await jwtUtils.validateAdminRoleAndToken(context)
-
-  await validator.validate(ajvUtils.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
-
-  const targetEmail = context.request.body.email
-
-  await validator.validateEmail(User, targetEmail)
-
-  const foundUser = await User.findOneAndDelete({ email: targetEmail })
-
-  context.send(201, {
-    message: `User ${foundUser.fullName}: ${foundUser.emit} deleted`
-  })
-})
+router.delete('/admin/users', middlewares.deleteUser) // admin wants to delete user
 
 module.exports = router
