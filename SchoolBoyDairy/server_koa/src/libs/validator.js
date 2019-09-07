@@ -1,5 +1,5 @@
 const utils = require('./utils')
-const ajvUtils = require('./libs/ajv')
+const ajvUtils = require('./ajv')
 module.exports = {
   validate: async function (schema, data, ajvInstance = ajvUtils.ajvInstance) {
     if (ajvInstance.validate(schema, data)) {

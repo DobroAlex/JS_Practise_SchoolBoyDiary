@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const ajvUtils = require('./libs/ajv')
-const validator = require('./validator')
-const utils = require('./utils')
+const validator = require('./libs/validator')
+const utils = require('./libs/utils')
 
 module.exports = {
   newAccessToken: function ({ email, role }, expiration = this.defaultExpireTime) {
