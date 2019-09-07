@@ -1,85 +1,18 @@
+const middleware = require('../middlewares/me')
+
 const Router = require('koa-router')
-const validator = require('../libs/validator')
-const ajvUtils = require('../libs/ajv')
-const User = require('../models/user')
-const utils = require('../libs/utils')
-const jwtUtils = require('../libs/jwt-utils')
-const _ = require('lodash')
 const router = new Router()
 
-router.post('/me/checkToken', async (context) => {
-  await jwtUtils.verifyAccessToken(context.request.body.token)
-  context.ok({ token: 'OK' })
-})
+router.post('/me/checkToken', middleware.checkToken)
 
-router.post('/me/checkRefreshToken', async (context) => {
-  await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
-  context.ok({ refreshToken: 'OK' })
-})
+router.post('/me/checkRefreshToken', middleware.checkRefreshToken)
 
-router.post('/me/refresh', async (context) => {
-  const decoded = await jwtUtils.verifyAccessToken(context.request.body.refreshToken, jwtUtils.defaultRefreshExpireTime)
-  const foundUser = await User.findOne({ email: decoded.email })
+router.post('/me/refresh', middleware.refreshMe)
 
-  if (!foundUser || (context.request.body.refreshToken !== foundUser.refreshToken)) {
-    throw utils.errorGenerator('Both token and refresh token expired, log in again', 401)
-  }
-  const token = jwtUtils.newAccessToken({
-    email: foundUser.email,
-    role: foundUser.role
-  })
-  const refreshToken = jwtUtils.newRefreshToken({
-    email: foundUser.email,
-    role: foundUser.role
-  })
+router.get('/me', middleware.getMe)
 
-  foundUser.refreshToken = refreshToken
-  await foundUser.save()
+router.put('/me', middleware.putMe)
 
-  context.ok({
-    token: token,
-    refreshToken: refreshToken
-  })
-})
-
-router.get('/me', async (context) => { // rout is used to get user
-  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-
-  await validator.validate(ajvUtils.JWT_TOKEN_SCHEMA, decoded)
-
-  const foundUser = await User.findOne({ email: decoded.email }, 'fullName description school class email phoneNumber role lessons homeTasks')
-
-  context.ok(foundUser)
-})
-
-router.put('/me', async (context) => { // rout is used to save user after modification on front-end
-  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-  await validator.validate(ajvUtils.JWT_TOKEN_SCHEMA, decoded) // validating token
-
-  await validator.validate(ajvUtils.PUT_ME_SCHEMA, context.request.body) // validating request body
-
-  let foundUser = await User.findOne({ email: decoded.email }, '')
-
-  foundUser = _.assign(foundUser, context.request.body)
-  await foundUser.save()
-
-  context.ok({
-    message: `User ${foundUser.fullName} : ${foundUser.email} updated`
-  })
-})
-
-router.delete('/me', async (context) => { // user wants to delete self
-  const decoded = jwtUtils.verifyAccessToken(jwtUtils.getTokenFromHeader(context))
-
-  await validator.validateEmail(User, decoded.email)
-
-  const foundUser = await User.findOneAndDelete({ email: decoded.email })
-  const userName = foundUser.fullName
-  const userMail = foundUser.email
-
-  context.send(201, {
-    message: `User ${userName}: ${userMail} deleted`
-  })
-})
+router.delete('/me', middleware.deleteMe)
 
 module.exports = router
