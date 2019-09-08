@@ -119,6 +119,7 @@
                         <td> {{lesson.date}} </td>
                         <td> {{lesson.state}} </td>
                         <button type="button" @click="editLesson(lesson)">Edit</button>
+                        <button type="button" @click="deleteLesson(lesson)">Delete</button>
                     </tr>
                 </table>
 
@@ -135,6 +136,7 @@
                         <td> {{task.task}} </td>
                         <td> {{task.state}} </td>
                         <button type="button" @click="editHomeTask(task)">Edit</button>
+                        <button type="button" @click="deleteHomeTask(task)">Delete</button>
                     </tr>
                 </table>
                 <p>
@@ -335,6 +337,14 @@ export default {
         saveEditedHomeTask: function(id, homeTask) {
             const index = this.findIndex(this.currentlyEditingUser.homeTasks, id)
             this.currentlyEditingUser.homeTasks[index] = homeTask
+        },
+        deleteLesson: function(lesson) {
+            const index = this.findIndex(this.currentlyEditingUser.lessons, lesson)
+            this.currentlyEditingUser.lessons.splice(index, 1)
+        },
+        deleteHomeTask: function(task) {
+            const index = this.findIndex(this.currentlyEditingUser.homeTasks, task)
+            this.currentlyEditingUser.homeTasks.splice(index, 1)
         },
         findIndex: function(arr, targetID) {
             let i
