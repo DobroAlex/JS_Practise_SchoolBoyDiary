@@ -3,8 +3,6 @@ const middleware = require('../middlewares/me')
 const Router = require('koa-router')
 const router = new Router()
 
-router.use(middleware.checkMyToken)
-
 router.post('/me/checkToken', middleware.checkToken)
 
 router.post('/me/checkRefreshToken', middleware.checkRefreshToken)
