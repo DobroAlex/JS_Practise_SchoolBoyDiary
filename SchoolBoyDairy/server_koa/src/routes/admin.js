@@ -3,6 +3,8 @@ const middlewares = require('../middlewares/admin')
 const Router = require('koa-router')
 const router = new Router()
 
+router.use(middlewares.checkAdminRole)
+
 router.get('/admin/users', middlewares.getUsers)
 
 router.post('/admin/users', middlewares.postUser)

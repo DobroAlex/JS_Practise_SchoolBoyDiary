@@ -5,8 +5,6 @@ const ajvUtils = require('../libs/ajv')
 const _ = require('lodash')
 
 async function getUsers (context, next) {
-  await jwtUtils.validateAdminRoleAndToken(context)
-
   const foundUsers = await User.find({}).sort({ email: -1 }) // Get all of them
 
   context.ok({ users: foundUsers })
@@ -14,8 +12,6 @@ async function getUsers (context, next) {
 
 async function putUser (context, next) {
   const requestBody = context.request.body
-
-  await jwtUtils.validateAdminRoleAndToken(context)
 
   await validator.validateEmail(User, requestBody.email) // ensuring that given user exists
 
@@ -32,8 +28,6 @@ async function putUser (context, next) {
 }
 
 async function deleteUser (context, next) {
-  await jwtUtils.validateAdminRoleAndToken(context)
-
   await validator.validate(ajvUtils.DELETE_USERS_EMAIL_SCHEMA, context.request.body)
 
   const targetEmail = context.request.body.email
@@ -48,8 +42,6 @@ async function deleteUser (context, next) {
 }
 
 async function postUser (context, next) {
-  await jwtUtils.validateAdminRoleAndToken(context)
-
   await validator.validate(ajvUtils.POST_USER_SCHEMA, context.request.body)
 
   let requestBody = context.request.body
@@ -69,4 +61,10 @@ async function postUser (context, next) {
   })
 }
 
-module.exports = { getUsers, postUser, putUser, deleteUser }
+async function checkAdminRole (context, next) {
+  await jwtUtils.validateAdminRoleAndToken(context)
+
+  await next()
+}
+
+module.exports = { getUsers, postUser, putUser, deleteUser, checkAdminRole }
